@@ -31,8 +31,12 @@ const Footer = () => {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
           {/* Brand Info */}
           <div className="col-span-2 md:col-span-1">
-            <div className="text-xl font-serif font-semibold text-teal mb-4">
-              Amelie Milano
+            <div className="h-12 mb-4">
+              <img
+                src="https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Fdf5c9374fa1341c5b13ec5b76a227fc3?format=webp&width=800&height=1200"
+                alt="Amelie Milano"
+                className="h-full object-contain"
+              />
             </div>
             <p className="text-sm text-stone-600 mb-6 leading-relaxed">
               Premium Italian-Western fashion and lifestyle brand for the modern, sophisticated woman.

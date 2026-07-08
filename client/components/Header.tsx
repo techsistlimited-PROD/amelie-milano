@@ -30,10 +30,12 @@ const Header = () => {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between py-6">
             {/* Logo */}
-            <Link to="/" className="flex-shrink-0">
-              <div className="text-2xl font-serif font-semibold text-teal">
-                Amelie Milano
-              </div>
+            <Link to="/" className="flex-shrink-0 h-12">
+              <img
+                src="https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Fdf5c9374fa1341c5b13ec5b76a227fc3?format=webp&width=800&height=1200"
+                alt="Amelie Milano"
+                className="h-full object-contain"
+              />
             </Link>
 
             {/* Main Navigation */}
@@ -93,10 +95,12 @@ const Header = () => {
             </button>
 
             {/* Logo */}
-            <Link to="/" className="flex-1 text-center">
-              <div className="text-xl font-serif font-semibold text-teal">
-                Amelie
-              </div>
+            <Link to="/" className="flex-1 text-center h-10">
+              <img
+                src="https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Fdf5c9374fa1341c5b13ec5b76a227fc3?format=webp&width=800&height=1200"
+                alt="Amelie Milano"
+                className="h-full object-contain inline"
+              />
             </Link>
 
             {/* Right Icons */}
