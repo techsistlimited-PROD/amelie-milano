@@ -6,8 +6,30 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+// Pages
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import Shop from "./pages/Shop";
+import Product from "./pages/Product";
+import Category from "./pages/Category";
+import Collection from "./pages/Collection";
+import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
+import Wishlist from "./pages/Wishlist";
+import Account from "./pages/Account";
+import OrderHistory from "./pages/OrderHistory";
+import About from "./pages/About";
+import BrandStory from "./pages/BrandStory";
+import StyleConcierge from "./pages/StyleConcierge";
+import Journal from "./pages/Journal";
+import Contact from "./pages/Contact";
+import FAQ from "./pages/FAQ";
+import SizeGuide from "./pages/SizeGuide";
+import Shipping from "./pages/Shipping";
+import Returns from "./pages/Returns";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
 
 const queryClient = new QueryClient();
 
@@ -19,6 +41,27 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/shop" element={<Shop />} />
+          <Route path="/shop/:category" element={<Category />} />
+          <Route path="/product/:id" element={<Product />} />
+          <Route path="/collection/:id" element={<Collection />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/account" element={<Account />} />
+          <Route path="/order-history" element={<OrderHistory />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/brand-story" element={<BrandStory />} />
+          <Route path="/style-concierge" element={<StyleConcierge />} />
+          <Route path="/journal/*" element={<Journal />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/size-guide" element={<SizeGuide />} />
+          <Route path="/shipping" element={<Shipping />} />
+          <Route path="/returns" element={<Returns />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/the-amelie-edit" element={<Collection />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
