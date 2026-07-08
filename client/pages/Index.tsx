@@ -98,42 +98,12 @@ const Index = () => {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative h-screen md:h-[600px] flex items-center justify-center overflow-hidden bg-gradient-to-br from-cream via-ivory to-white">
-        <div className="absolute inset-0 opacity-20">
-          <svg className="w-full h-full" viewBox="0 0 1000 600" preserveAspectRatio="none">
-            <path
-              d="M 0 300 Q 250 200, 500 300 T 1000 300 L 1000 0 L 0 0 Z"
-              fill="url(#grad)"
-              opacity="0.1"
-            />
-            <defs>
-              <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#0D5863" />
-                <stop offset="100%" stopColor="#f5f0e8" />
-              </linearGradient>
-            </defs>
-          </svg>
-        </div>
-
-        <div className="relative z-10 container mx-auto px-4 text-center">
-          <div className="max-w-2xl mx-auto">
-            <p className="text-teal font-medium text-sm md:text-base tracking-wider mb-4 uppercase">
-              New Collection 2024
-            </p>
-            <h1 className="text-display text-stone-900 mb-6">
-              Elegance Refined
-            </h1>
-            <p className="text-base md:text-lg text-stone-600 mb-8 leading-relaxed">
-              Discover our curated collection of premium Italian-Western fashion, crafted for the modern, sophisticated woman.
-            </p>
-            <Link to="/shop" className="btn-primary inline-block">
-              Explore Collection
-            </Link>
-          </div>
-        </div>
-
-        {/* Decorative Element */}
-        <div className="absolute top-20 right-10 w-64 h-64 bg-teal-50 rounded-full mix-blend-multiply filter blur-3xl opacity-30"></div>
+      <section className="relative h-screen md:h-[600px] flex items-center justify-center overflow-hidden">
+        <img
+          src="https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F6ba0c56d2b5444dab686f518bdc1db41?format=webp&width=800&height=1200"
+          alt="Italian Elegance"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
       </section>
 
       {/* Shop by Category */}
