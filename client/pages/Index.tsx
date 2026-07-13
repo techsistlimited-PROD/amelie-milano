@@ -110,8 +110,8 @@ const Index = () => {
       {/* Hero Section */}
       <section className="relative h-screen md:h-[600px] flex items-center justify-center overflow-hidden">
         <img
-          src="https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F6ba0c56d2b5444dab686f518bdc1db41?format=webp&width=800&height=1200"
-          alt="Italian Elegance"
+          src="https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F5aa7f80c289a43d3b87e7f6ef3a83b4b?format=webp&width=800&height=1200"
+          alt="Italian Elegance. Bengali Soul."
           className="absolute inset-0 w-full h-full object-cover"
         />
       </section>
