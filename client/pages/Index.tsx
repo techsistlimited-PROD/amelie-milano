@@ -72,32 +72,32 @@ const bestSellers = [
 const categories = [
   {
     name: "Dresses",
-    image: "https://images.unsplash.com/photo-1595777707802-221466a7e5c0?w=600&h=600&fit=crop",
+    image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Fd82ccb0930fd4d0e8a2edb49f49368e1?format=webp&width=800&height=1200",
     href: "/shop/dresses",
   },
   {
     name: "Occasionwear",
-    image: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=600&h=600&fit=crop",
+    image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Ff2edad5f9989469e9179290f0356a25b?format=webp&width=800&height=1200",
     href: "/shop/occasionwear",
   },
   {
     name: "Bags",
-    image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&h=600&fit=crop",
+    image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F3988c05f36f646f7a4b4e3d2bb4d5577?format=webp&width=800&height=1200",
     href: "/shop/bags",
   },
   {
     name: "Shoes",
-    image: "https://images.unsplash.com/photo-1543163521-9145f931371e?w=600&h=600&fit=crop",
+    image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Fa188b5e269974be1a7c523bdc5828e29?format=webp&width=800&height=1200",
     href: "/shop/shoes",
   },
   {
     name: "Body Care",
-    image: "https://images.unsplash.com/photo-1556410351-2b3a7f6f8a4d?w=600&h=600&fit=crop",
+    image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Fb5e5c4bd8fac48ca88b902093690eca1?format=webp&width=800&height=1200",
     href: "/shop/body-care",
   },
   {
     name: "Gym Wear",
-    image: "https://images.unsplash.com/photo-1506629082147-11fa2e49a148?w=600&h=600&fit=crop",
+    image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F61b91b6c3b7641a5a64f36a2e0bd93b6?format=webp&width=800&height=1200",
     href: "/shop/gym-wear",
   },
 ];
