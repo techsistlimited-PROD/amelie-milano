@@ -117,18 +117,18 @@ const Index = () => {
       </section>
 
       {/* Shop by Category */}
-      <section className="section-spacing bg-white">
+      <section className="bg-white py-8 md:py-12">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-heading text-stone-900 mb-4">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl md:text-3xl font-serif font-semibold text-stone-900 mb-2">
               Shop by Category
             </h2>
-            <p className="text-stone-600 max-w-lg mx-auto">
+            <p className="text-stone-600 text-sm max-w-lg mx-auto">
               Explore our curated collections designed for every occasion and lifestyle
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-5 lg:gap-4">
             {categories.map((cat) => (
               <CategoryCardSimple key={cat.name} {...cat} />
             ))}
