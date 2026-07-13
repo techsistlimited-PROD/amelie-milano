@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import CategoryCard from "@/components/CategoryCard";
+import CategoryCardSimple from "@/components/CategoryCardSimple";
 import { ChevronRight, MessageCircle } from "lucide-react";
 
 // Mock data - will be replaced with CMS data
@@ -75,6 +76,11 @@ const categories = [
     href: "/shop/dresses",
   },
   {
+    name: "Occasionwear",
+    image: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=600&h=600&fit=crop",
+    href: "/shop/occasionwear",
+  },
+  {
     name: "Bags",
     image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&h=600&fit=crop",
     href: "/shop/bags",
@@ -88,7 +94,11 @@ const categories = [
     name: "Body Care",
     image: "https://images.unsplash.com/photo-1556410351-2b3a7f6f8a4d?w=600&h=600&fit=crop",
     href: "/shop/body-care",
-    isWide: true,
+  },
+  {
+    name: "Gym Wear",
+    image: "https://images.unsplash.com/photo-1506629082147-11fa2e49a148?w=600&h=600&fit=crop",
+    href: "/shop/gym-wear",
   },
 ];
 
@@ -107,7 +117,7 @@ const Index = () => {
       </section>
 
       {/* Shop by Category */}
-      <section className="section-spacing">
+      <section className="section-spacing bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-heading text-stone-900 mb-4">
@@ -118,9 +128,9 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
             {categories.map((cat) => (
-              <CategoryCard key={cat.name} {...cat} />
+              <CategoryCardSimple key={cat.name} {...cat} />
             ))}
           </div>
         </div>
