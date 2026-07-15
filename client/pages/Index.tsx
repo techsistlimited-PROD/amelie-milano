@@ -41,30 +41,27 @@ const newArrivals = [
 const bestSellers = [
   {
     id: "5",
-    name: "Luxury Body Oil",
-    price: 3500,
-    image: "https://images.unsplash.com/photo-1556410351-2b3a7f6f8a4d?w=500&h=500&fit=crop",
-    isSale: true,
+    name: "Emerald Sculpted Cut-Out Midi",
+    price: 9800,
+    image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Fdcc6f86cb6304c5fb08d26ef7042210a?format=webp&width=800&height=1200",
   },
   {
     id: "6",
-    name: "Leather Structured Bag",
-    price: 18999,
-    salePrice: 15199,
-    image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&h=500&fit=crop",
-    isSale: true,
+    name: "Noir Draped Signature Midi",
+    price: 8200,
+    image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F95373c4bbed741118a67d63a23bbdf72?format=webp&width=800&height=1200",
   },
   {
     id: "7",
-    name: "Premium Gym Set",
-    price: 6999,
-    image: "https://images.unsplash.com/photo-1506629082147-11fa2e49a148?w=500&h=500&fit=crop",
+    name: "Ivory Lace Trim Satin Mini",
+    price: 9200,
+    image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Fb635bffe5fd04d4a8f493a13dd95ab3d?format=webp&width=800&height=1200",
   },
   {
     id: "8",
-    name: "Italian Leather Heels",
-    price: 11999,
-    image: "https://images.unsplash.com/photo-1543163521-9145f931371e?w=500&h=500&fit=crop",
+    name: "Cobalt Ruched Draped Mini",
+    price: 7200,
+    image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F8a0c8e89869744efbbc501318fe5aef5?format=webp&width=800&height=1200",
   },
 ];
 
