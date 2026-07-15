@@ -104,11 +104,11 @@ const Index = () => {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative h-screen md:h-[600px] flex items-center justify-center overflow-hidden">
+      <section className="relative aspect-[4/3] md:aspect-[3/1] flex items-center justify-center overflow-hidden bg-stone-950">
         <img
-          src="https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F5aa7f80c289a43d3b87e7f6ef3a83b4b?format=webp&width=800&height=1200"
+          src="https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F41503ed6b6384ec098bdd9f6977128f5?format=webp&width=2000&quality=95"
           alt="Italian Elegance. Bengali Soul."
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover object-center"
         />
       </section>
 
