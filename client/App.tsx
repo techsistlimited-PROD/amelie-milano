@@ -14,6 +14,7 @@ import Shop from "./pages/Shop";
 import Product from "./pages/Product";
 import Category from "./pages/Category";
 import NewIn from "./pages/NewIn";
+import Occasionwear from "./pages/Occasionwear";
 import Collection from "./pages/Collection";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
@@ -44,6 +45,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/shop/new" element={<NewIn />} />
+          <Route path="/shop/occasionwear" element={<Occasionwear />} />
           <Route path="/shop/:category" element={<Category />} />
           <Route path="/product/:id" element={<Product />} />
           <Route path="/collection/:id" element={<Collection />} />
