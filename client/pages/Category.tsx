@@ -200,7 +200,7 @@ const Category = () => {
               <div className="relative md:pl-8">
                 <div className="absolute -top-5 -right-2 w-32 h-32 rounded-full border border-teal/20" />
                 <img
-                  src="https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F5aa7f80c289a43d3b87e7f6ef3a83b4b?format=webp&width=1200&height=1600"
+                  src="https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F87192a4e5d0949b8b89c181ebaa5ef28?format=webp&width=1200&height=1600"
                   alt="Amelie Milano dresses"
                   className="relative w-full aspect-[4/5] object-cover rounded-sm"
                 />
