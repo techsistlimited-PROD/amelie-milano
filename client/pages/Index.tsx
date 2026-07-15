@@ -225,7 +225,7 @@ const Index = () => {
             </div>
             <div className="relative h-96 md:h-full rounded-lg overflow-hidden">
               <img
-                src="https://images.unsplash.com/photo-1540183388-f94340b70d16?w=600&h=600&fit=crop"
+                src="https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Fa040fefdb8b84ba48c5f3f10f68cf2db?format=webp&width=1600&quality=90"
                 alt="Occasionwear"
                 className="w-full h-full object-cover"
               />
@@ -234,63 +234,53 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Italian Edit Editorial Section */}
-      <section className="section-spacing bg-gradient-to-b from-cream to-ivory">
+      {/* The Amelie Edit Editorial Section */}
+      <section className="section-spacing bg-ivory">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center mb-12">
-            <p className="text-teal font-medium text-sm tracking-wider uppercase mb-4">
-              Editorial
-            </p>
-            <h2 className="text-heading text-stone-900 mb-6">
-              The Amelie Edit
-            </h2>
-            <p className="text-stone-600 text-lg leading-relaxed">
-              Our curated selection of European-inspired pieces that define contemporary femininity. Discover the stories, the craftsmanship, and the soul behind every collection.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-6 md:gap-8">
-            <article className="group">
-              <div className="relative h-64 md:h-96 rounded-lg overflow-hidden mb-6">
-                <img
-                  src="https://images.unsplash.com/photo-1595916743269-ff24e1ffde43?w=600&h=600&fit=crop"
-                  alt="Italian Craftsmanship"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-              </div>
-              <p className="text-teal text-sm font-medium mb-2 uppercase tracking-wider">
-                Craftsmanship
+          <div className="grid md:grid-cols-2 gap-12 md:gap-20 items-center mb-16 md:mb-24">
+            <article className="group max-w-md md:justify-self-end">
+              <p className="text-teal text-[10px] font-semibold mb-3 uppercase tracking-[0.2em]">
+                Italian Craftsmanship
               </p>
-              <h3 className="text-subheading text-stone-900 mb-3 group-hover:text-teal transition-colors">
+              <h2 className="font-serif text-3xl md:text-4xl text-stone-900 mb-4 group-hover:text-teal transition-colors">
                 The Art of Italian Tailoring
-              </h3>
+              </h2>
               <p className="text-stone-600 text-sm leading-relaxed mb-4">
-                Explore how centuries of Italian fashion heritage inspire every stitch in the Amelie collection...
+                Explore how centuries of Italian fashion heritage inspire every stitch in the Amelie collection.
               </p>
-              <Link to="/journal/italian-tailoring" className="text-teal font-medium text-sm hover:text-teal-dark flex items-center gap-2">
-                Read More <ChevronRight size={16} />
+              <Link to="/journal/italian-tailoring" className="text-teal font-medium text-xs hover:text-teal-dark flex items-center gap-2">
+                Read More <ChevronRight size={15} />
               </Link>
             </article>
+            <div className="relative h-64 md:h-72 overflow-hidden">
+              <img
+                src="https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F92b67c169b484849bc0557782bc3580b?format=webp&width=1600&quality=90"
+                alt="Italian craftsmanship with fabric and thread"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+            </div>
+          </div>
 
-            <article className="group">
-              <div className="relative h-64 md:h-96 rounded-lg overflow-hidden mb-6">
-                <img
-                  src="https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=600&h=600&fit=crop"
-                  alt="Style Tips"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-              </div>
-              <p className="text-teal text-sm font-medium mb-2 uppercase tracking-wider">
+          <div className="grid md:grid-cols-2 gap-12 md:gap-20 items-center">
+            <div className="relative h-64 md:h-72 overflow-hidden md:order-1">
+              <img
+                src="https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Fc09eb3a2d9da4b20b5d3d99979a90b4f?format=webp&width=1600&quality=90"
+                alt="Style guide editorial with fashion sketch and accessories"
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+              />
+            </div>
+            <article className="group max-w-md md:order-2">
+              <p className="text-teal text-[10px] font-semibold mb-3 uppercase tracking-[0.2em]">
                 Style Guide
               </p>
-              <h3 className="text-subheading text-stone-900 mb-3 group-hover:text-teal transition-colors">
+              <h2 className="font-serif text-3xl md:text-4xl text-stone-900 mb-4 group-hover:text-teal transition-colors">
                 Styling the Perfect Wardrobe Essentials
-              </h3>
+              </h2>
               <p className="text-stone-600 text-sm leading-relaxed mb-4">
-                Learn how to mix and match our pieces to create sophisticated, versatile looks for any occasion...
+                Learn how to mix and match our pieces to create sophisticated, versatile looks for any occasion.
               </p>
-              <Link to="/journal/wardrobe-essentials" className="text-teal font-medium text-sm hover:text-teal-dark flex items-center gap-2">
-                Read More <ChevronRight size={16} />
+              <Link to="/journal/wardrobe-essentials" className="text-teal font-medium text-xs hover:text-teal-dark flex items-center gap-2">
+                Read More <ChevronRight size={15} />
               </Link>
             </article>
           </div>
