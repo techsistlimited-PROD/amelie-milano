@@ -237,6 +237,18 @@ const Index = () => {
       {/* The Amelie Edit Editorial Section */}
       <section className="section-spacing bg-ivory">
         <div className="container mx-auto px-4">
+          <div className="text-center max-w-2xl mx-auto mb-14 md:mb-20">
+            <p className="text-teal text-[10px] font-semibold uppercase tracking-[0.24em] mb-3">
+              Editorial
+            </p>
+            <h2 className="font-serif text-4xl md:text-5xl text-stone-900 mb-4">
+              The Amelie Edit
+            </h2>
+            <p className="text-stone-600 text-sm md:text-base leading-relaxed">
+              Stories of craftsmanship, style, and the art of dressing beautifully.
+            </p>
+          </div>
+
           <div className="grid md:grid-cols-2 gap-12 md:gap-20 items-center mb-16 md:mb-24">
             <article className="group max-w-md md:justify-self-end">
               <p className="text-teal text-[10px] font-semibold mb-3 uppercase tracking-[0.2em]">
