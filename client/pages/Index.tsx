@@ -380,8 +380,8 @@ const Index = () => {
           <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
             <div className="relative h-96 md:h-full rounded-lg overflow-hidden">
               <img
-                src="https://images.unsplash.com/photo-1556410351-2b3a7f6f8a4d?w=600&h=600&fit=crop"
-                alt="Body Care"
+                src="https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F0d417769e65540bd9117838b5867ff55?format=webp&width=1600&quality=90"
+                alt="Luxury Body Care"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -440,16 +440,14 @@ const Index = () => {
                 className="relative aspect-square rounded-lg overflow-hidden group"
               >
                 <img
-                  src={`https://images.unsplash.com/photo-${
-                    [
-                      "1595777707802-221466a7e5c0",
-                      "1594938298603-c8148c4dae35",
-                      "1596215267419-f7e0dc9e7ecd",
-                      "1591195853828-11db59a44f6b",
-                      "1556410351-2b3a7f6f8a4d",
-                      "1553062407-98eeb64c6a62",
-                    ][i - 1]
-                  }?w=400&h=400&fit=crop`}
+                  src={[
+                    "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F364feacf7efb4d44a25c5c9e3d6993a1?format=webp&width=800&height=1200",
+                    "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F16fa447f693649098784bf9dda62013e?format=webp&width=800&height=1200",
+                    "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Fb4f07e253f7d4d9b9dbe177a23c45542?format=webp&width=800&height=1200",
+                    "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F0650cd08c0e24f9f826d751cec812038?format=webp&width=800&height=1200",
+                    "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F63a7deba53de4477819e21620ada607c?format=webp&width=800&height=1200",
+                    "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F53321ed54c234d73bda8c6d825654742?format=webp&width=800&height=1200",
+                  ][i - 1]}
                   alt={`Instagram post ${i}`}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
