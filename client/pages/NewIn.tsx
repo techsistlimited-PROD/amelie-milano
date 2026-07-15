@@ -45,7 +45,7 @@ const newInProducts = [
     id: "7",
     name: "Emerald Sculpted Cut-Out Midi",
     price: 9800,
-    image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f6ef3a83b4b?format=webp&width=800&height=1200",
+    image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Fdcc6f86cb6304c5fb08d26ef7042210a?format=webp&width=800&height=1200",
   },
   {
     id: "8",
@@ -89,7 +89,7 @@ const NewIn = () => (
     <Header />
     <main>
       <section className="relative min-h-[620px] md:h-[700px] flex items-end overflow-hidden bg-stone-900">
-        <img src="https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F87192a4e5d0949b8b89c181ebaa5ef28?format=webp&width=1600&height=2000" alt="Amelie Milano new collection" className="absolute inset-0 h-full w-full object-cover object-center" />
+        <img src="https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F8427b1d1349f455fa006745ab19f45ee?format=webp&width=1600&height=2000" alt="Amelie Milano new collection" className="absolute inset-0 h-full w-full object-cover object-center" />
         <div className="absolute inset-0 bg-gradient-to-r from-stone-950/65 via-stone-950/20 to-transparent" />
         <div className="relative z-10 container mx-auto px-4 pb-16 md:pb-20">
           <div className="max-w-xl text-white">
