@@ -13,7 +13,6 @@ const Header = () => {
     { label: "Gym Wear", href: "/shop/gym-wear" },
     { label: "Bags", href: "/shop/bags" },
     { label: "Shoes", href: "/shop/shoes" },
-    { label: "Accessories", href: "/shop/accessories" },
     { label: "The Amelie Edit", href: "/the-amelie-edit" },
   ];
 

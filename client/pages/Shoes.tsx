@@ -4,12 +4,12 @@ import { Heart, ChevronRight } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-const shoeHero = "https://images.unsplash.com/photo-1543163521-9145f931371e?w=1800&h=900&fit=crop";
+const shoeHero = "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F21fa9163980c45ff97fd07989209f916?format=webp&width=1800&quality=95";
 const shoeProducts = [
-  { id: "shoe-1", name: "Luna Gold Flower Heel", price: 11999, image: "https://images.unsplash.com/photo-1543163521-9145f931371e?w=900&h=1200&fit=crop", tag: "New" },
-  { id: "shoe-2", name: "Milano Leather Slingback", price: 10400, salePrice: 8900, image: "https://images.unsplash.com/photo-1533867617858-e7b97e060509?w=900&h=1200&fit=crop", tag: "Sale" },
-  { id: "shoe-3", name: "Sera Sculpted Court Shoe", price: 9800, image: "https://images.unsplash.com/photo-1560343090-f0409e92791a?w=900&h=1200&fit=crop" },
-  { id: "shoe-4", name: "Aurelia Strappy Evening Sandal", price: 11200, image: "https://images.unsplash.com/photo-1515347619252-60a4bf4fff4f?w=900&h=1200&fit=crop", tag: "New" },
+  { id: "shoe-1", name: "Minimalist Strappy Slingback", price: 12500, salePrice: undefined, image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F2212b0db0546488f91f833bc79c19386?format=webp&width=800&height=1200", tag: "New" },
+  { id: "shoe-2", name: "Golden Luxe Platform Heel", price: 18000, salePrice: undefined, image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F63618dadc38341448c40401de698c1a3?format=webp&width=800&height=1200", tag: undefined },
+  { id: "shoe-3", name: "Plum Satin Pointed Pump", price: 15500, salePrice: undefined, image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Fd7b4fd59933245aa890cebc73c7fb97a?format=webp&width=800&height=1200", tag: undefined },
+  { id: "shoe-4", name: "Sleek Noir Stiletto", price: 16000, salePrice: undefined, image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F606f0c5a602940c39450810bc343af4e?format=webp&width=800&height=1200", tag: undefined },
 ];
 
 const ShoeCard = ({ product }: { product: (typeof shoeProducts)[number] }) => {

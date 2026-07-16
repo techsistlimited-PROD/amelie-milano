@@ -85,11 +85,6 @@ const Footer = () => {
                   Shoes
                 </Link>
               </li>
-              <li>
-                <Link to="/shop/accessories" className="text-stone-600 hover:text-teal transition-colors">
-                  Accessories
-                </Link>
-              </li>
             </ul>
           </div>
 
