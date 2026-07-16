@@ -6,6 +6,7 @@ const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const mainMenu = [
+    { label: "About Amelie", href: "/about" },
     { label: "New In", href: "/shop/new" },
     { label: "Dresses", href: "/shop/dresses" },
     { label: "Occasionwear", href: "/shop/occasionwear" },
