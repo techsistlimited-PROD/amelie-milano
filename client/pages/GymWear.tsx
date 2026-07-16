@@ -4,18 +4,19 @@ import { ChevronRight, Heart } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-const gymHero = "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F61b91b6c3b7641a5a64f36a2e0bd93b6?format=webp&width=1600&quality=95";
+const gymHero = "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F56076a5843aa49afaee6765ec232fb48?format=webp&width=1600&quality=95";
+const performanceImage = "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F6af834a3717748bcb25681adfb4d935f?format=webp&width=1400&quality=95";
 const gymProducts = [
-  { id: "gym-set", name: "Sculpted Studio Set", price: 6999, image: gymHero },
-  { id: "motion-bodysuit", name: "Motion Contour Bodysuit", price: 5400, image: "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=900&h=1200&fit=crop" },
-  { id: "studio-legging", name: "Italian Stretch Legging", price: 4200, image: "https://images.unsplash.com/photo-1506629082147-11fa2e49a148?w=900&h=1200&fit=crop" },
-  { id: "wrap-layer", name: "Soft Sculpt Wrap Layer", price: 4800, image: "https://images.unsplash.com/photo-1518310383802-640c2de311b2?w=900&h=1200&fit=crop" },
+  { id: "gym-set", name: "Crimson Performance Leggings Set", price: 4999, image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F897f9afa654c44f292a3fed3858eeb93?format=webp&width=800&height=1200" },
+  { id: "motion-bodysuit", name: "Fuchsia Halter Bodysuit", price: 4299, image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Fafb1ea344f204331a0bc446e3d8efd35?format=webp&width=800&height=1200" },
+  { id: "studio-legging", name: "Aqua Active Shorts & Crop", price: 4299, image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F2b939239e652498cba1172e841dcc89d?format=webp&width=800&height=1200" },
+  { id: "wrap-layer", name: "Midnight Sculpt Zip Set", price: 5899, image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F2034f77daf684b7fb584d6403bd9af9c?format=webp&width=800&height=1200" },
 ];
 
 const editorial = [
   { title: "The Studio Set", image: gymHero },
   { title: "Designed To Move", image: "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=900&h=1200&fit=crop" },
-  { title: "Quiet Strength", image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=900&h=1200&fit=crop" },
+  { title: "Quiet Strength", image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Fc09762a587cd4b7e88b529cc61d301c5?format=webp&width=800&height=1200" },
 ];
 
 const GymProduct = ({ product }: { product: (typeof gymProducts)[number] }) => {
@@ -35,7 +36,7 @@ const GymWear = () => (
 
       <section id="gym-collection" className="bg-ivory py-16 md:py-24"><div className="container mx-auto px-4"><div className="flex items-end justify-between mb-10"><div><p className="text-teal text-[10px] uppercase tracking-[0.24em] mb-3">The collection</p><h2 className="font-serif text-4xl md:text-5xl text-stone-900">Gym Wear</h2></div><span className="text-sm text-stone-500">4 considered pieces</span></div><div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-4 md:gap-x-6 md:gap-y-14">{gymProducts.map((product) => <GymProduct key={product.id} product={product} />)}</div></div></section>
 
-      <section className="bg-cream/60 py-16 md:py-24"><div className="container mx-auto px-4"><div className="grid md:grid-cols-2 gap-10 md:gap-20 items-center"><div className="overflow-hidden"><img src={editorial[2].image} alt="Luxury in motion" className="w-full aspect-[4/5] object-cover" /></div><div className="max-w-md"><p className="text-teal text-[10px] uppercase tracking-[0.24em] mb-4">Performance &amp; Comfort</p><h2 className="font-serif text-4xl md:text-5xl text-stone-900 mb-5">Luxury in Motion</h2><p className="text-stone-600 leading-relaxed">Every piece of Amelie Milano Gym Wear is crafted with attention to fit, comfort, and modern elegance.</p></div></div></div></section>
+      <section className="bg-cream/60 py-16 md:py-24"><div className="container mx-auto px-4"><div className="grid md:grid-cols-2 gap-10 md:gap-20 items-center"><div className="overflow-hidden"><img src={performanceImage} alt="Luxury in motion" className="w-full aspect-[4/5] object-cover" /></div><div className="max-w-md"><p className="text-teal text-[10px] uppercase tracking-[0.24em] mb-4">Performance &amp; Comfort</p><h2 className="font-serif text-4xl md:text-5xl text-stone-900 mb-5">Luxury in Motion</h2><p className="text-stone-600 leading-relaxed">Every piece of Amelie Milano Gym Wear is crafted with attention to fit, comfort, and modern elegance.</p></div></div></div></section>
 
       <section className="bg-white py-16 md:py-24"><div className="container mx-auto px-4"><div className="text-center mb-10"><p className="text-teal text-[10px] uppercase tracking-[0.24em] mb-3">Styling guide</p><h2 className="font-serif text-4xl md:text-5xl text-stone-900">Mix. Move. Repeat.</h2></div><div className="grid md:grid-cols-3 gap-5"><div className="bg-cream/50 p-7"><span className="text-gold font-serif text-4xl">01</span><h3 className="font-serif text-2xl mt-5 mb-3">Studio to street</h3><p className="text-sm text-stone-600 leading-relaxed">Layer a sculpted set with a soft wrap for an effortless day-to-evening silhouette.</p></div><div className="bg-cream/50 p-7"><span className="text-gold font-serif text-4xl">02</span><h3 className="font-serif text-2xl mt-5 mb-3">Tone on tone</h3><p className="text-sm text-stone-600 leading-relaxed">Keep the palette refined and let fabric, line and movement speak.</p></div><div className="bg-cream/50 p-7"><span className="text-gold font-serif text-4xl">03</span><h3 className="font-serif text-2xl mt-5 mb-3">Your ritual</h3><p className="text-sm text-stone-600 leading-relaxed">Choose pieces that make movement feel personal, powerful and beautifully yours.</p></div></div></div></section>
 
