@@ -6,8 +6,8 @@ import Footer from "@/components/Footer";
 
 const bagHero = "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Ff1f6f45679f74ebfb38d3aff1d54c46c?format=webp&width=1800&quality=95";
 const bagProducts = [
-  { id: "bag-1", name: "Milano Structured Bag", price: 18999, image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=900&h=1200&fit=crop", tag: "New" },
-  { id: "bag-2", name: "Luna Soft Leather Shoulder Bag", price: 15400, salePrice: 12900, image: "https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=900&h=1200&fit=crop", tag: "Sale" },
+  { id: "bag-1", name: "Cocoa Ruched Suede Clutch", price: 18999, image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Ff027f54464044c2aa55976ea27dc0ee0?format=webp&width=800&height=1200", tag: "New" },
+  { id: "bag-2", name: "Noir Floral Sequin Clutch", price: 15400, salePrice: 12900, image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F67b0e8db28dc48d48e09be9a4afa2e23?format=webp&width=800&height=1200", tag: "Sale" },
   { id: "bag-3", name: "Sera Evening Clutch", price: 8900, image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=900&h=1200&fit=crop", tag: "New" },
   { id: "bag-4", name: "Amelie Mini Top Handle", price: 11900, image: "https://images.unsplash.com/photo-1594223274512-ad4803739b7c?w=900&h=1200&fit=crop" },
 ];
