@@ -4,7 +4,7 @@ import { Heart, ChevronRight } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-const bagHero = "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=1800&h=900&fit=crop";
+const bagHero = "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Ff1f6f45679f74ebfb38d3aff1d54c46c?format=webp&width=1800&quality=95";
 const bagProducts = [
   { id: "bag-1", name: "Milano Structured Bag", price: 18999, image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=900&h=1200&fit=crop", tag: "New" },
   { id: "bag-2", name: "Luna Soft Leather Shoulder Bag", price: 15400, salePrice: 12900, image: "https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=900&h=1200&fit=crop", tag: "Sale" },

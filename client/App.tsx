@@ -18,6 +18,7 @@ import Occasionwear from "./pages/Occasionwear";
 import BodyCare from "./pages/BodyCare";
 import GymWear from "./pages/GymWear";
 import Bags from "./pages/Bags";
+import Shoes from "./pages/Shoes";
 import Collection from "./pages/Collection";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
@@ -52,6 +53,7 @@ const App = () => (
           <Route path="/shop/body-care" element={<BodyCare />} />
           <Route path="/shop/gym-wear" element={<GymWear />} />
           <Route path="/shop/bags" element={<Bags />} />
+          <Route path="/shop/shoes" element={<Shoes />} />
           <Route path="/shop/:category" element={<Category />} />
           <Route path="/product/:id" element={<Product />} />
           <Route path="/collection/:id" element={<Collection />} />
