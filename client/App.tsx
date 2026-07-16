@@ -16,6 +16,7 @@ import Category from "./pages/Category";
 import NewIn from "./pages/NewIn";
 import Occasionwear from "./pages/Occasionwear";
 import BodyCare from "./pages/BodyCare";
+import GymWear from "./pages/GymWear";
 import Collection from "./pages/Collection";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
@@ -48,6 +49,7 @@ const App = () => (
           <Route path="/shop/new" element={<NewIn />} />
           <Route path="/shop/occasionwear" element={<Occasionwear />} />
           <Route path="/shop/body-care" element={<BodyCare />} />
+          <Route path="/shop/gym-wear" element={<GymWear />} />
           <Route path="/shop/:category" element={<Category />} />
           <Route path="/product/:id" element={<Product />} />
           <Route path="/collection/:id" element={<Collection />} />
