@@ -14,7 +14,7 @@ const gymProducts = [
 ];
 
 const editorial = [
-  { title: "The Studio Set", image: gymHero },
+  { title: "The Studio Set", image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F0a39aea80a894baab5125b343377e4ff?format=webp&width=1400&quality=95" },
   { title: "Designed To Move", image: "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=900&h=1200&fit=crop" },
   { title: "Quiet Strength", image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Fc09762a587cd4b7e88b529cc61d301c5?format=webp&width=800&height=1200" },
 ];
