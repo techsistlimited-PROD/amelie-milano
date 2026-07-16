@@ -23,6 +23,7 @@ import TheAmelieEdit from "./pages/TheAmelieEdit";
 import Collection from "./pages/Collection";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
+import OrderConfirmation from "./pages/OrderConfirmation";
 import Wishlist from "./pages/Wishlist";
 import Account from "./pages/Account";
 import OrderHistory from "./pages/OrderHistory";
@@ -60,6 +61,7 @@ const App = () => (
           <Route path="/collection/:id" element={<Collection />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/order-confirmation" element={<OrderConfirmation />} />
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/account" element={<Account />} />
           <Route path="/order-history" element={<OrderHistory />} />

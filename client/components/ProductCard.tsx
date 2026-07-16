@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import { Heart, ShoppingBag } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { addToCart } from "@/lib/cart";
 
 interface ProductCardProps {
   id: string;
@@ -24,6 +26,12 @@ const ProductCard = ({
   isLowStock,
 }: ProductCardProps) => {
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const navigate = useNavigate();
+
+  const handleAddToCart = () => {
+    addToCart({ id, name, price: salePrice ?? price, image, category: "Amelie Milano", colour: "Signature colour", option: "M", quantity: 1 });
+    navigate("/cart");
+  };
 
   return (
     <div className="group">
@@ -69,7 +77,7 @@ const ProductCard = ({
 
         {/* Add to Cart Button - Hidden until hover */}
         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-colors duration-200 flex items-end justify-center pb-4 opacity-0 group-hover:opacity-100">
-          <button className="bg-white text-teal font-medium px-6 py-2 rounded-lg hover:bg-teal hover:text-white transition-colors duration-200 flex items-center gap-2">
+          <button onClick={handleAddToCart} className="bg-white text-teal font-medium px-6 py-2 rounded-lg hover:bg-teal hover:text-white transition-colors duration-200 flex items-center gap-2">
             <ShoppingBag size={18} />
             Add to Cart
           </button>
