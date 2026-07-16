@@ -1,10 +1,4 @@
-import PlaceholderPage from "./PlaceholderPage";
+import PolicyPageLayout from "@/components/PolicyPageLayout";
 
-const Returns = () => (
-  <PlaceholderPage
-    title="Returns & Exchanges"
-    description="Understand our return and exchange policy, eligibility requirements, and how to initiate a return."
-  />
-);
-
+const Returns = () => <PolicyPageLayout eyebrow="A seamless experience" title="Returns & Exchanges" subtitle="Easy, seamless, and secure returns and exchanges for your Amelie Milano pieces." image="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1800&h=1000&fit=crop" sections={[{ title: "Return policy", bullets: ["Returns are accepted within 7 days of delivery.", "Products must be unused and in their original packaging.", "All original tags must remain attached and the item must be in resalable condition."] }, { title: "Exchange policy", body: <p>Exchanges for a different size or color are available within 7 days. If you upgrade to a higher-priced product, the difference and any applicable delivery fee will be payable by the customer.</p> }, { title: "How to initiate", body: <p>Log in to your account, open <strong className="text-stone-900">Orders</strong>, select <strong className="text-stone-900">Request Return/Exchange</strong>, and follow the instructions. Our team will guide you through the next step.</p> }, { title: "Refunds", body: <p>Approved refunds are processed within 5–7 business days to the original payment method. Processing time may vary slightly depending on your bank or payment provider.</p> }]} faqs={[["Can I return multiple items together?", "Yes, as long as each item meets our return criteria and is included in the same return request."], ["Can I exchange an item for a different category?", "Exchanges are available within the same product category. Please contact our team if you need help choosing an alternative."]]}/>;
 export default Returns;

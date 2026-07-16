@@ -1,10 +1,4 @@
-import PlaceholderPage from "./PlaceholderPage";
+import PolicyPageLayout from "@/components/PolicyPageLayout";
 
-const Shipping = () => (
-  <PlaceholderPage
-    title="Shipping & Delivery"
-    description="Learn about our delivery options, shipping costs, delivery timeframes, and tracking information."
-  />
-);
-
+const Shipping = () => <PolicyPageLayout eyebrow="Delivery, considered" title="Shipping & Delivery" subtitle="Fast, secure, and stylish delivery options for your luxury purchases." image="https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=1800&h=1000&fit=crop" sections={[{ title: "Delivery methods", bullets: ["Regular Delivery — 3–5 business days, complimentary.", "Express Delivery — same or next day, BDT 200.", "Collect From Store — available at our Gulshan-1 store, complimentary."] }, { title: "Shipping costs", body: <p>Regular delivery and Collect From Store are free. Express delivery is available for a flat fee of <strong className="text-stone-900">BDT 200</strong>.</p> }, { title: "Tracking your order", body: <p>Every dispatched order includes a tracking number sent to your email. Use it to follow your parcel through our website or the courier link provided in your dispatch confirmation.</p> }, { title: "International shipping", body: <p>We currently deliver within Bangladesh. As Amelie Milano grows, we hope to expand our considered delivery experience to more destinations.</p> }]} faqs={[["Can I change my delivery address after placing the order?", "Yes, within 24 hours, provided your order has not yet been dispatched. Contact our team as soon as possible."], ["What happens if I am not home?", "Our courier will leave a notice or attempt delivery again the following day. You can also contact the courier using the tracking details."]]}/>;
 export default Shipping;
