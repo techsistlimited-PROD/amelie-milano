@@ -19,6 +19,7 @@ import BodyCare from "./pages/BodyCare";
 import GymWear from "./pages/GymWear";
 import Bags from "./pages/Bags";
 import Shoes from "./pages/Shoes";
+import TheAmelieEdit from "./pages/TheAmelieEdit";
 import Collection from "./pages/Collection";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
@@ -73,7 +74,7 @@ const App = () => (
           <Route path="/returns" element={<Returns />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
-          <Route path="/the-amelie-edit" element={<Collection />} />
+          <Route path="/the-amelie-edit" element={<TheAmelieEdit />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
