@@ -15,7 +15,11 @@ const Header = () => {
     const syncCartCount = () => setCartCount(cartItemCount(readCart()));
     syncCartCount();
     window.addEventListener(cartEventName, syncCartCount);
-    return () => window.removeEventListener(cartEventName, syncCartCount);
+    window.addEventListener("storage", syncCartCount);
+    return () => {
+      window.removeEventListener(cartEventName, syncCartCount);
+      window.removeEventListener("storage", syncCartCount);
+    };
   }, []);
 
   const suggestions = searchQuery.trim().length > 1 ? storeCatalog.filter((product) => product.name.toLowerCase().includes(searchQuery.trim().toLowerCase())).slice(0, 5) : [];
