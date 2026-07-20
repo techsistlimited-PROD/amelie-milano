@@ -4,6 +4,7 @@ import cors from "cors";
 import { handleDemo } from "./routes/demo";
 import { handleNewsletterSubscribe } from "./routes/newsletter";
 import { changePassword, getAccount, updateAccount } from "./routes/account";
+import { createOrder, listOrders, requestReturn } from "./routes/orders";
 
 export function createServer() {
   const app = express();
@@ -24,6 +25,9 @@ export function createServer() {
   app.get("/api/account", getAccount);
   app.put("/api/account", updateAccount);
   app.put("/api/account/password", changePassword);
+  app.get("/api/orders", listOrders);
+  app.post("/api/orders", createOrder);
+  app.patch("/api/orders/:number/return", requestReturn);
 
   return app;
 }

@@ -25,6 +25,7 @@ export interface OrderRecord extends OrderTotals {
   address: DeliveryAddress;
   delivery: "regular" | "express";
   payment: string;
+  returnRequested?: boolean;
 }
 
 const ORDERS_KEY = "amelie-milano-orders";
@@ -58,6 +59,26 @@ export const createOrder = (order: Omit<OrderRecord, "number" | "createdAt">): O
   window.localStorage.setItem(ORDERS_KEY, JSON.stringify([record, ...orders]));
   window.localStorage.setItem(LAST_ORDER_KEY, JSON.stringify(record));
   return record;
+};
+
+const orderHeaders = (userId = "guest") => ({ "Content-Type": "application/json", "x-user-id": userId });
+
+export const syncOrder = async (order: OrderRecord, userId = "guest") => {
+  const response = await fetch("/api/orders", { method: "POST", headers: orderHeaders(userId), body: JSON.stringify(order) });
+  if (!response.ok) throw new Error("Unable to sync order with the order service.");
+  return order;
+};
+
+export const fetchOrders = async (userId = "guest") => {
+  const response = await fetch("/api/orders", { headers: orderHeaders(userId) });
+  if (!response.ok) throw new Error("Unable to load orders.");
+  return await response.json() as OrderRecord[];
+};
+
+export const requestOrderReturn = async (number: string, userId = "guest") => {
+  const response = await fetch(`/api/orders/${encodeURIComponent(number)}/return`, { method: "PATCH", headers: orderHeaders(userId) });
+  if (!response.ok) throw new Error("Unable to start the return request.");
+  return await response.json() as OrderRecord;
 };
 
 export const orderTax = (subtotal: number, discount = 0) => Math.round(Math.max(0, subtotal - discount) * 0.05);

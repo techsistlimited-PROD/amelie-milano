@@ -4,7 +4,7 @@ import { ArrowLeft, ArrowRight, Check, Lock, ShieldCheck } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { cartSubtotal, readCart, writeCart, type CartItem } from "@/lib/cart";
-import { createOrder, orderTax, type DeliveryAddress } from "@/lib/orders";
+import { createOrder, orderTax, syncOrder, type DeliveryAddress } from "@/lib/orders";
 import { readSession, requestPhoneOtp, signInWithEmail, signInWithOAuth, signUpWithEmail, verifyPhoneOtp, type AuthUser } from "@/lib/auth";
 
 const initialAddress: DeliveryAddress = { firstName: "", lastName: "", email: "", phone: "", address: "", city: "", postalCode: "" };
@@ -62,13 +62,14 @@ const Checkout = () => {
     setStep("payment");
   };
 
-  const completeOrder = () => {
+  const completeOrder = async () => {
     if (payment === "card" && Object.values(cardDetails).some((value) => !value.trim())) {
       setPaymentError("Please complete your card details before placing the order.");
       return;
     }
     setPaymentError("");
     const order = createOrder({ items, address, delivery, payment, subtotal, discount: 0, shipping, tax, total });
+    await syncOrder(order, authUser?.id || "guest");
     writeCart([]);
     navigate(`/order-confirmation?order=${encodeURIComponent(order.number)}`);
   };
