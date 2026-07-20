@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight, Heart, Minus, Plus, ShoppingBag } from "lucide-react";
 import { addToCart } from "@/lib/cart";
+import { useWishlist } from "@/lib/wishlist";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -27,7 +28,7 @@ const occasions = [
 ];
 
 const OccasionProduct = ({ product }: { product: (typeof products)[number] }) => {
-  const [wishlisted, setWishlisted] = useState(false);
+  const { saved: wishlisted, toggle } = useWishlist({ id: product.id, name: product.name, price: product.price, image: product.image, category: "Occasionwear", colour: "Signature colour", option: "M" });
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const handleAdd = () => { addToCart({ id: product.id, name: product.name, price: product.price, image: product.image, category: "Occasionwear", colour: "Signature colour", option: "M", quantity }); setAdded(true); };
@@ -36,7 +37,7 @@ const OccasionProduct = ({ product }: { product: (typeof products)[number] }) =>
       <div className="relative overflow-hidden bg-beige/30 mb-4">
         <Link to={`/product/${product.id}`}><img src={product.image} alt={product.name} className="w-full aspect-[3/4] object-cover group-hover:scale-[1.03] transition-transform duration-500" /></Link>
         <span className="absolute top-3 left-3 bg-white/90 px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-stone-700">New</span>
-        <button type="button" aria-label={`${wishlisted ? "Remove" : "Add"} ${product.name} ${wishlisted ? "from" : "to"} wishlist`} onClick={() => setWishlisted(!wishlisted)} className="absolute top-3 right-3 rounded-full bg-white/90 p-2 text-stone-700 hover:text-teal"><Heart size={16} className={wishlisted ? "fill-teal text-teal" : ""} /></button>
+        <button type="button" aria-label={`${wishlisted ? "Remove" : "Add"} ${product.name} ${wishlisted ? "from" : "to"} wishlist`} onClick={toggle} className="absolute top-3 right-3 rounded-full bg-white/90 p-2 text-stone-700 hover:text-teal"><Heart size={16} className={wishlisted ? "fill-teal text-teal" : ""} /></button>
         <div className="absolute inset-x-0 bottom-0 flex translate-y-0 md:translate-y-full items-center justify-between gap-2 bg-white/95 p-3 transition-transform duration-300 group-hover:translate-y-0"><div className="flex items-center border border-stone-200"><button type="button" aria-label="Decrease quantity" onClick={() => setQuantity(Math.max(1, quantity - 1))} className="p-2 text-stone-600 hover:text-teal"><Minus size={13} /></button><span className="w-6 text-center text-sm">{quantity}</span><button type="button" aria-label="Increase quantity" onClick={() => setQuantity(quantity + 1)} className="p-2 text-stone-600 hover:text-teal"><Plus size={13} /></button></div><button type="button" onClick={handleAdd} className="flex flex-1 items-center justify-center gap-1 bg-teal px-3 py-2 text-[10px] uppercase tracking-[0.1em] text-white hover:bg-teal-dark"><ShoppingBag size={14} />{added ? "Added" : "Add"}</button></div>
       </div>
       <Link to={`/product/${product.id}`}><h3 className="font-serif text-lg leading-tight text-stone-900 group-hover:text-teal transition-colors">{product.name}</h3></Link>

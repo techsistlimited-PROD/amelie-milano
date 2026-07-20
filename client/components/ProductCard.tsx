@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Heart, ShoppingBag } from "lucide-react";
-import { useState } from "react";
+import { useWishlist } from "@/lib/wishlist";
 import { useNavigate } from "react-router-dom";
 import { addToCart } from "@/lib/cart";
 
@@ -25,7 +25,7 @@ const ProductCard = ({
   isSale,
   isLowStock,
 }: ProductCardProps) => {
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const { saved: isWishlisted, toggle: toggleWishlist } = useWishlist({ id, name, price: salePrice ?? price, image, category: "Amelie Milano", colour: "Signature colour", option: "M" });
   const navigate = useNavigate();
 
   const handleAddToCart = () => {
@@ -66,7 +66,7 @@ const ProductCard = ({
 
         {/* Wishlist Button */}
         <button
-          onClick={() => setIsWishlisted(!isWishlisted)}
+          onClick={toggleWishlist}
           className="absolute top-4 right-4 bg-white rounded-full p-2 shadow-md hover:shadow-lg transition-all duration-200"
         >
           <Heart
