@@ -436,7 +436,10 @@ const Index = () => {
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <a
                 key={i}
-                href="#"
+                href="https://www.instagram.com/ameliemilano16"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`View Amelie Milano Instagram post ${i}`}
                 className="relative aspect-square rounded-lg overflow-hidden group"
               >
                 <img

@@ -36,10 +36,10 @@ const Footer = () => {
               Premium Italian-Western fashion and lifestyle brand for the modern, sophisticated woman.
             </p>
             <div className="flex gap-4">
-              <a href="#" className="text-teal hover:text-teal-dark transition-colors">
+              <a href="https://www.instagram.com/ameliemilano16" target="_blank" rel="noopener noreferrer" aria-label="Amelie Milano on Instagram" className="text-teal hover:text-teal-dark transition-colors">
                 <Instagram size={20} />
               </a>
-              <a href="#" className="text-teal hover:text-teal-dark transition-colors">
+              <a href="https://www.facebook.com/people/Amelie-Milano/61585229184857" target="_blank" rel="noopener noreferrer" aria-label="Amelie Milano on Facebook" className="text-teal hover:text-teal-dark transition-colors">
                 <Facebook size={20} />
               </a>
             </div>
