@@ -1,10 +1,14 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { FormEvent, useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Menu, X, Search, User, Heart, ShoppingBag } from "lucide-react";
 import { cartEventName, cartItemCount, readCart } from "@/lib/cart";
+import { storeCatalog } from "@/lib/storeCatalog";
 
 const Header = () => {
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
@@ -13,6 +17,20 @@ const Header = () => {
     window.addEventListener(cartEventName, syncCartCount);
     return () => window.removeEventListener(cartEventName, syncCartCount);
   }, []);
+
+  const suggestions = searchQuery.trim().length > 1 ? storeCatalog.filter((product) => product.name.toLowerCase().includes(searchQuery.trim().toLowerCase())).slice(0, 5) : [];
+  const submitSearch = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const query = searchQuery.trim();
+    if (!query) return;
+    setSearchOpen(false);
+    navigate(`/shop?query=${encodeURIComponent(query)}`);
+  };
+  const chooseSuggestion = (name: string) => {
+    setSearchQuery(name);
+    setSearchOpen(false);
+    navigate(`/shop?query=${encodeURIComponent(name)}`);
+  };
 
   const mainMenu = [
     { label: "About Amelie", href: "/about" },
@@ -65,7 +83,7 @@ const Header = () => {
 
             {/* Right Icons */}
             <div className="flex items-center gap-6">
-              <button className="text-stone-600 hover:text-teal transition-colors duration-200">
+              <button type="button" aria-label="Open product search" aria-expanded={searchOpen} onClick={() => setSearchOpen(true)} className="text-stone-600 hover:text-teal transition-colors duration-200">
                 <Search size={20} />
               </button>
               <Link
@@ -114,7 +132,7 @@ const Header = () => {
 
             {/* Right Icons */}
             <div className="flex items-center gap-4">
-              <button className="text-stone-600 hover:text-teal transition-colors duration-200">
+              <button type="button" aria-label="Open product search" aria-expanded={searchOpen} onClick={() => setSearchOpen(true)} className="text-stone-600 hover:text-teal transition-colors duration-200">
                 <Search size={20} />
               </button>
               <Link
@@ -165,6 +183,7 @@ const Header = () => {
           )}
         </div>
       </header>
+      {searchOpen && <div className="fixed inset-x-0 top-9 z-50 border-b border-stone-200 bg-white px-4 py-5 shadow-lg"><form onSubmit={submitSearch} className="container mx-auto max-w-3xl"><div className="flex items-center gap-3 border-b border-stone-300 pb-3"><Search size={20} className="shrink-0 text-teal" /><label htmlFor="header-search" className="sr-only">Search Amelie Milano products</label><input id="header-search" autoFocus value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder="Search dresses, bags, body care..." className="min-w-0 flex-1 bg-transparent text-base text-stone-900 outline-none placeholder:text-stone-400" /><button type="submit" className="text-xs uppercase tracking-[0.14em] text-teal hover:text-teal-dark">Search</button><button type="button" aria-label="Close product search" onClick={() => setSearchOpen(false)} className="text-stone-500 hover:text-teal"><X size={20} /></button></div>{suggestions.length > 0 && <div className="mt-3" role="listbox" aria-label="Product suggestions">{suggestions.map((product) => <button type="button" key={product.id} onClick={() => chooseSuggestion(product.name)} className="flex w-full items-center gap-3 px-2 py-2 text-left hover:bg-[#F0E9E2]"><img src={product.image} alt="" className="h-10 w-8 object-cover" /><span><span className="block font-serif text-base text-stone-900">{product.name}</span><span className="block text-[10px] uppercase tracking-[0.12em] text-stone-500">{product.category} · BDT {product.price.toLocaleString()}</span></span></button>)}</div>}{searchQuery.trim().length > 1 && suggestions.length === 0 && <p className="mt-3 text-sm text-stone-500">Press Search to view matching pieces.</p>}</form></div>}
     </>
   );
 };
