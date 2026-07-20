@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, X, Search, User, Heart, ShoppingBag } from "lucide-react";
 import { cartEventName, cartItemCount, readCart } from "@/lib/cart";
@@ -10,6 +10,14 @@ const Header = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [cartCount, setCartCount] = useState(0);
+  const searchTriggerRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!searchOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => { if (event.key === "Escape") { setSearchOpen(false); searchTriggerRef.current?.focus(); } };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [searchOpen]);
 
   useEffect(() => {
     const syncCartCount = () => setCartCount(cartItemCount(readCart()));
@@ -87,24 +95,27 @@ const Header = () => {
 
             {/* Right Icons */}
             <div className="flex items-center gap-6">
-              <button type="button" aria-label="Open product search" aria-expanded={searchOpen} onClick={() => setSearchOpen(true)} className="text-stone-600 hover:text-teal transition-colors duration-200">
+              <button ref={searchTriggerRef} type="button" aria-label="Open product search" aria-expanded={searchOpen} onClick={() => setSearchOpen(true)} className="text-stone-600 hover:text-teal transition-colors duration-200">
                 <Search size={20} />
               </button>
               <Link
                 to="/account"
-                className="text-stone-600 hover:text-teal transition-colors duration-200"
+                aria-label="My account"
+                className="text-stone-600 hover:text-teal transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal"
               >
                 <User size={20} />
               </Link>
               <Link
                 to="/wishlist"
-                className="text-stone-600 hover:text-teal transition-colors duration-200"
+                aria-label="My wishlist"
+                className="text-stone-600 hover:text-teal transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal"
               >
                 <Heart size={20} />
               </Link>
               <Link
                 to="/cart"
-                className="text-stone-600 hover:text-teal transition-colors duration-200"
+                aria-label="Shopping cart"
+                className="text-stone-600 hover:text-teal transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal"
               >
                 <span className="relative"><ShoppingBag size={20} />{cartCount > 0 && <span className="absolute -top-2 -right-3 bg-teal text-white text-[10px] rounded-full min-w-4 h-4 px-1 flex items-center justify-center">{cartCount}</span>}</span>
               </Link>
@@ -114,7 +125,7 @@ const Header = () => {
       </header>
 
       {/* Mobile Header */}
-      <header className="md:hidden bg-white border-b border-stone-200 sticky top-9 z-40">
+      <header className="md:hidden bg-white border-b border-stone-200 sticky top-0 z-40">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             {/* Hamburger Menu */}
@@ -136,12 +147,13 @@ const Header = () => {
 
             {/* Right Icons */}
             <div className="flex items-center gap-4">
-              <button type="button" aria-label="Open product search" aria-expanded={searchOpen} onClick={() => setSearchOpen(true)} className="text-stone-600 hover:text-teal transition-colors duration-200">
+              <button ref={searchTriggerRef} type="button" aria-label="Open product search" aria-expanded={searchOpen} onClick={() => setSearchOpen(true)} className="text-stone-600 hover:text-teal transition-colors duration-200">
                 <Search size={20} />
               </button>
               <Link
                 to="/cart"
-                className="text-stone-600 hover:text-teal transition-colors duration-200 relative"
+                aria-label="Shopping cart"
+                className="text-stone-600 hover:text-teal transition-colors duration-200 relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal"
               >
                 <ShoppingBag size={20} />
                 {cartCount > 0 && <span className="absolute -top-2 -right-2 bg-teal text-white text-xs rounded-full min-w-5 h-5 px-1 flex items-center justify-center">
@@ -187,7 +199,7 @@ const Header = () => {
           )}
         </div>
       </header>
-      {searchOpen && <div className="fixed inset-x-0 top-9 z-50 border-b border-stone-200 bg-white px-4 py-5 shadow-lg"><form onSubmit={submitSearch} className="container mx-auto max-w-3xl"><div className="flex items-center gap-3 border-b border-stone-300 pb-3"><Search size={20} className="shrink-0 text-teal" /><label htmlFor="header-search" className="sr-only">Search Amelie Milano products</label><input id="header-search" autoFocus value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder="Search dresses, bags, body care..." className="min-w-0 flex-1 bg-transparent text-base text-stone-900 outline-none placeholder:text-stone-400" /><button type="submit" className="text-xs uppercase tracking-[0.14em] text-teal hover:text-teal-dark">Search</button><button type="button" aria-label="Close product search" onClick={() => setSearchOpen(false)} className="text-stone-500 hover:text-teal"><X size={20} /></button></div>{suggestions.length > 0 && <div className="mt-3" role="listbox" aria-label="Product suggestions">{suggestions.map((product) => <button type="button" key={product.id} onClick={() => chooseSuggestion(product.name)} className="flex w-full items-center gap-3 px-2 py-2 text-left hover:bg-[#F0E9E2]"><img src={product.image} alt="" className="h-10 w-8 object-cover" /><span><span className="block font-serif text-base text-stone-900">{product.name}</span><span className="block text-[10px] uppercase tracking-[0.12em] text-stone-500">{product.category} · BDT {product.price.toLocaleString()}</span></span></button>)}</div>}{searchQuery.trim().length > 1 && suggestions.length === 0 && <p className="mt-3 text-sm text-stone-500">Press Search to view matching pieces.</p>}</form></div>}
+      {searchOpen && <div role="dialog" aria-modal="true" aria-label="Product search" className="fixed inset-x-0 top-9 z-50 border-b border-stone-200 bg-white px-4 py-5 shadow-lg"><form onSubmit={submitSearch} className="container mx-auto max-w-3xl"><div className="flex items-center gap-3 border-b border-stone-300 pb-3"><Search size={20} className="shrink-0 text-teal" /><label htmlFor="header-search" className="sr-only">Search Amelie Milano products</label><input id="header-search" autoFocus value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder="Search dresses, bags, body care..." className="min-w-0 flex-1 bg-transparent text-base text-stone-900 outline-none placeholder:text-stone-400" /><button type="submit" className="text-xs uppercase tracking-[0.14em] text-teal hover:text-teal-dark">Search</button><button type="button" aria-label="Close product search" onClick={() => setSearchOpen(false)} className="text-stone-500 hover:text-teal"><X size={20} /></button></div>{suggestions.length > 0 && <div className="mt-3" role="listbox" aria-label="Product suggestions">{suggestions.map((product) => <button type="button" key={product.id} onClick={() => chooseSuggestion(product.name)} className="flex w-full items-center gap-3 px-2 py-2 text-left hover:bg-[#F0E9E2]"><img src={product.image} alt="" className="h-10 w-8 object-cover" /><span><span className="block font-serif text-base text-stone-900">{product.name}</span><span className="block text-[10px] uppercase tracking-[0.12em] text-stone-500">{product.category} · BDT {product.price.toLocaleString()}</span></span></button>)}</div>}{searchQuery.trim().length > 1 && suggestions.length === 0 && <p className="mt-3 text-sm text-stone-500">Press Search to view matching pieces.</p>}</form></div>}
     </>
   );
 };

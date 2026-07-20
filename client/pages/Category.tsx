@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { ChevronRight, Filter, Heart, MessageCircle, X } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useWishlist } from "@/lib/wishlist";
 import PlaceholderPage from "./PlaceholderPage";
 
 const dressProducts = [
@@ -78,7 +79,7 @@ const filterGroups = [
 ];
 
 const DressProductCard = ({ product }: { product: (typeof dressProducts)[number] }) => {
-  const [wishlisted, setWishlisted] = useState(false);
+  const { saved: wishlisted, toggle } = useWishlist({ id: product.id, name: product.name, price: product.salePrice ?? product.price, image: product.image, category: "Dresses", colour: product.colour, option: "M" });
 
   return (
     <article className="group">
@@ -98,7 +99,7 @@ const DressProductCard = ({ product }: { product: (typeof dressProducts)[number]
         <button
           type="button"
           aria-label={`${wishlisted ? "Remove" : "Add"} ${product.name} ${wishlisted ? "from" : "to"} wishlist`}
-          onClick={() => setWishlisted(!wishlisted)}
+          onClick={toggle}
           className="absolute top-3 right-3 bg-white/90 p-2 rounded-full text-stone-700 hover:text-teal transition-colors"
         >
           <Heart size={16} className={wishlisted ? "fill-teal text-teal" : ""} />
@@ -278,7 +279,7 @@ const Category = () => {
         </section>
 
         <section className="bg-teal-50 py-14 md:py-20">
-          <div className="container mx-auto px-4 text-center max-w-2xl"><MessageCircle className="mx-auto text-teal mb-4" size={28} /><h2 className="font-serif text-3xl md:text-4xl text-stone-900 mb-4">Need help choosing the perfect dress?</h2><p className="text-stone-600 leading-relaxed mb-7">Our Style Concierge can help you find the right silhouette, size and styling direction for your occasion.</p><button type="button" className="btn-primary">Chat on WhatsApp</button></div>
+          <div className="container mx-auto px-4 text-center max-w-2xl"><MessageCircle className="mx-auto text-teal mb-4" size={28} /><h2 className="font-serif text-3xl md:text-4xl text-stone-900 mb-4">Need help choosing the perfect dress?</h2><p className="text-stone-600 leading-relaxed mb-7">Our Style Concierge can help you find the right silhouette, size and styling direction for your occasion.</p><a href="https://wa.me/8801777993895?text=Hello%20Amelie%20Milano%2C%20I%20would%20love%20help%20choosing%20a%20dress." target="_blank" rel="noopener noreferrer" className="btn-primary inline-flex">Chat on WhatsApp</a></div>
         </section>
 
         <section className="bg-white py-14 md:py-20"><div className="container mx-auto px-4"><div className="flex items-end justify-between mb-8"><div><p className="text-teal text-[10px] uppercase tracking-[0.2em] mb-3">Complete the look</p><h2 className="font-serif text-4xl text-stone-900">You May Also Like</h2></div><Link to="/shop" className="hidden sm:flex items-center gap-2 text-xs uppercase tracking-wider text-teal">Shop all <ChevronRight size={15} /></Link></div><div className="grid grid-cols-2 md:grid-cols-4 gap-4">{dressProducts.slice(2, 6).map((product) => <DressProductCard key={`related-${product.id}`} product={product} />)}</div></div></section>

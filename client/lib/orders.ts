@@ -23,7 +23,7 @@ export interface OrderRecord extends OrderTotals {
   createdAt: string;
   items: CartItem[];
   address: DeliveryAddress;
-  delivery: "regular" | "express";
+  delivery: "regular" | "express" | "store";
   payment: string;
   returnRequested?: boolean;
 }

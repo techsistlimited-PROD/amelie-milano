@@ -32,6 +32,7 @@ import BrandStory from "./pages/BrandStory";
 import StyleConcierge from "./pages/StyleConcierge";
 import Journal from "./pages/Journal";
 import JournalArticle from "./pages/JournalArticle";
+import SiteMeta from "./components/SiteMeta";
 import Contact from "./pages/Contact";
 import FAQ from "./pages/FAQ";
 import SizeGuide from "./pages/SizeGuide";
@@ -48,6 +49,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <SiteMeta />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/shop" element={<Shop />} />
