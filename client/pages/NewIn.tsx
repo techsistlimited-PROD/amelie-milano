@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight, Heart, Minus, Plus, ShoppingBag } from "lucide-react";
 import { addToCart } from "@/lib/cart";
+import NewsletterForm from "@/components/NewsletterForm";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -130,7 +131,7 @@ const NewIn = () => (
 
       <section className="bg-white py-14 md:py-20"><div className="container mx-auto px-4"><div className="flex flex-wrap justify-center gap-x-8 gap-y-4 border-y border-stone-200 py-7">{categories.map((category) => <Link key={category.href} to={category.href} className="text-xs uppercase tracking-[0.16em] text-stone-600 hover:text-teal transition-colors">{category.label}</Link>)}</div></div></section>
 
-      <section className="bg-beige/70 py-16 md:py-24"><div className="container mx-auto px-4 text-center max-w-2xl"><p className="text-teal text-[10px] font-semibold uppercase tracking-[0.26em] mb-5">Amelie Milano</p><h2 className="font-serif text-4xl md:text-6xl leading-tight text-stone-900 mb-5">Italian elegance,<br />designed for modern women.</h2><p className="text-stone-600 mb-8">Join our world of refined fashion, curated collections and timeless pieces.</p><form onSubmit={(event) => event.preventDefault()} className="mx-auto flex max-w-md border-b border-stone-700"><input type="email" placeholder="Your email address" className="min-w-0 flex-1 bg-transparent px-0 py-3 text-sm focus:outline-none" /><button type="submit" className="px-2 py-3 text-xs uppercase tracking-[0.16em] text-teal">Subscribe</button></form></div></section>
+      <section className="bg-beige/70 py-16 md:py-24"><div className="container mx-auto px-4 text-center max-w-2xl"><p className="text-teal text-[10px] font-semibold uppercase tracking-[0.26em] mb-5">Amelie Milano</p><h2 className="font-serif text-4xl md:text-6xl leading-tight text-stone-900 mb-5">Italian elegance,<br />designed for modern women.</h2><p className="text-stone-600 mb-8">Join our world of refined fashion, curated collections and timeless pieces.</p><NewsletterForm className="mx-auto flex max-w-md border-b border-stone-700" inputClassName="min-w-0 flex-1 bg-transparent px-0 py-3 text-sm focus:outline-none" buttonClassName="px-2 py-3 text-xs uppercase tracking-[0.16em] text-teal" placeholder="Your email address" /></div></section>
     </main>
     <Footer />
   </div>

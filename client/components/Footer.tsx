@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Mail, Instagram, Facebook, TrendingUp } from "lucide-react";
+import NewsletterForm from "@/components/NewsletterForm";
 
 const Footer = () => {
   return (
@@ -14,14 +15,7 @@ const Footer = () => {
             <p className="text-stone-600 mb-6 text-sm md:text-base">
               Subscribe to our newsletter for exclusive styles, early access to collections, and special offers.
             </p>
-            <form className="flex gap-2 md:gap-3" onSubmit={(e) => e.preventDefault()}>
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1 px-4 py-3 rounded-lg bg-white border border-stone-200 text-sm focus:outline-none focus:border-teal"
-              />
-              <button className="btn-primary text-sm md:text-base">Subscribe</button>
-            </form>
+            <NewsletterForm />
           </div>
         </div>
       </div>
