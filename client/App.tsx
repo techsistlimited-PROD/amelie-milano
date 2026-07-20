@@ -31,6 +31,7 @@ import About from "./pages/About";
 import BrandStory from "./pages/BrandStory";
 import StyleConcierge from "./pages/StyleConcierge";
 import Journal from "./pages/Journal";
+import JournalArticle from "./pages/JournalArticle";
 import Contact from "./pages/Contact";
 import FAQ from "./pages/FAQ";
 import SizeGuide from "./pages/SizeGuide";
@@ -68,6 +69,7 @@ const App = () => (
           <Route path="/about" element={<About />} />
           <Route path="/brand-story" element={<BrandStory />} />
           <Route path="/style-concierge" element={<StyleConcierge />} />
+          <Route path="/journal/:slug" element={<JournalArticle />} />
           <Route path="/journal/*" element={<Journal />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/faq" element={<FAQ />} />
