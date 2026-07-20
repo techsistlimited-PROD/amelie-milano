@@ -195,4 +195,8 @@
   .contact-field {
     @apply mt-2 block w-full border border-stone-200 bg-[#F9F5F0] px-4 py-3 text-sm text-stone-900 placeholder:text-stone-400 outline-none transition-colors focus:border-[#0057B8];
   }
+
+  .concierge-field {
+    @apply mt-2 block w-full border border-stone-200 bg-[#F5F1ED] px-4 py-3 text-sm text-stone-900 placeholder:text-stone-400 outline-none transition-colors focus:border-[#5C7A73];
+  }
 }
