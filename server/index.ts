@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
 import { handleNewsletterSubscribe } from "./routes/newsletter";
+import { changePassword, getAccount, updateAccount } from "./routes/account";
 
 export function createServer() {
   const app = express();
@@ -20,6 +21,9 @@ export function createServer() {
 
   app.get("/api/demo", handleDemo);
   app.post("/api/newsletter/subscribe", handleNewsletterSubscribe);
+  app.get("/api/account", getAccount);
+  app.put("/api/account", updateAccount);
+  app.put("/api/account/password", changePassword);
 
   return app;
 }
