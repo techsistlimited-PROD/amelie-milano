@@ -1,10 +1,16 @@
-import PlaceholderPage from "./PlaceholderPage";
+import { useState } from "react";
+import { Heart, ShoppingBag, Trash2 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import { addToCart } from "@/lib/cart";
 
-const Wishlist = () => (
-  <PlaceholderPage
-    title="My Wishlist"
-    description="Save your favorite pieces for later. Keep track of items you love and get notified about price drops."
-  />
-);
+const initialItems = [
+  { id: "1", name: "Espresso Drape Kaftan Dress", price: 8375, category: "Dresses", image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Fca01513621cd4cd19c92e5bb2129ea91?format=webp&width=900&height=1200" },
+  { id: "bag-1", name: "Cocoa Ruched Suede Clutch", price: 18999, category: "Bags", image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Ff027f54464044c2aa55976ea27dc0ee0?format=webp&width=900&height=1200" },
+  { id: "shoe-1", name: "Minimalist Strappy Slingback", price: 12500, category: "Shoes", image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F2212b0db0546488f91f833bc79c19386?format=webp&width=900&height=1200" },
+  { id: "gym-set", name: "Crimson Performance Leggings Set", price: 4999, category: "Gym Wear", image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F897f9afa654c44f292a3fed3858eeb93?format=webp&width=900&height=1200" },
+];
 
+const Wishlist = () => { const navigate = useNavigate(); const [items, setItems] = useState(initialItems); const addItem = (item: typeof initialItems[number]) => { addToCart({ ...item, colour: "Signature colour", option: "M", quantity: 1 }); navigate("/cart"); }; return <div className="min-h-screen bg-[#F9F6F2] text-stone-900"><Header /><main className="container mx-auto px-4 py-10 md:py-16"><div className="mx-auto max-w-6xl"><div className="mb-10 flex items-end justify-between gap-4"><div><p className="mb-3 text-[10px] uppercase tracking-[0.26em] text-teal">Home / My Wishlist</p><h1 className="font-serif text-5xl md:text-6xl">My Wishlist</h1><p className="mt-3 text-sm text-stone-600">Pieces you love, kept close for later.</p></div>{items.length > 1 && <button onClick={() => items.forEach(addItem)} className="hidden items-center gap-2 bg-teal px-5 py-3 text-xs uppercase tracking-[0.14em] text-white hover:bg-teal-dark sm:inline-flex"><ShoppingBag size={15} /> Add All to Cart</button>}</div>{items.length ? <><div className="mb-8 flex items-center gap-3 border-y border-stone-200 py-4 text-sm text-stone-600"><Heart size={16} className="fill-[#C69B6D] text-[#C69B6D]" /> {items.length} saved pieces <span className="text-stone-300">·</span> <span>We’ll let you know about restocks and price changes.</span></div><div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4 md:gap-x-6">{items.map((item) => <article key={item.id} className="group"><div className="relative mb-4 overflow-hidden bg-white"><Link to={`/product/${item.id}`}><img src={item.image} alt={item.name} className="aspect-[3/4] w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" /></Link><button onClick={() => setItems(items.filter((saved) => saved.id !== item.id))} aria-label={`Remove ${item.name} from wishlist`} className="absolute right-3 top-3 rounded-full bg-white/90 p-2 text-stone-600 hover:text-red-700"><Trash2 size={15} /></button></div><p className="text-[10px] uppercase tracking-[0.16em] text-teal">{item.category}</p><Link to={`/product/${item.id}`}><h2 className="mt-2 font-serif text-xl leading-tight group-hover:text-teal">{item.name}</h2></Link><p className="mt-2 text-sm">BDT {item.price.toLocaleString()}</p><button onClick={() => addItem(item)} className="mt-4 inline-flex w-full items-center justify-center gap-2 border border-teal px-3 py-2 text-xs uppercase tracking-[0.12em] text-teal hover:bg-teal hover:text-white"><ShoppingBag size={14} /> Add to Cart</button></article>)}</div></> : <div className="bg-white px-6 py-24 text-center shadow-sm ring-1 ring-stone-200"><Heart className="mx-auto mb-5 text-[#C69B6D]" size={38} /><h2 className="font-serif text-3xl">Your wishlist is empty.</h2><p className="mx-auto mt-3 max-w-md text-sm leading-7 text-stone-600">Start adding your favorite pieces and we’ll keep them here for your next considered edit.</p><Link to="/shop/new" className="btn-primary mt-7 inline-flex">Explore New Arrivals</Link></div>}</div></main><Footer /></div>; };
 export default Wishlist;
