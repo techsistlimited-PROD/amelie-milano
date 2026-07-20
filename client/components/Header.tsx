@@ -1,9 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X, Search, User, Heart, ShoppingBag } from "lucide-react";
+import { cartEventName, cartItemCount, readCart } from "@/lib/cart";
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    const syncCartCount = () => setCartCount(cartItemCount(readCart()));
+    syncCartCount();
+    window.addEventListener(cartEventName, syncCartCount);
+    return () => window.removeEventListener(cartEventName, syncCartCount);
+  }, []);
 
   const mainMenu = [
     { label: "About Amelie", href: "/about" },
@@ -75,7 +84,7 @@ const Header = () => {
                 to="/cart"
                 className="text-stone-600 hover:text-teal transition-colors duration-200"
               >
-                <ShoppingBag size={20} />
+                <span className="relative"><ShoppingBag size={20} />{cartCount > 0 && <span className="absolute -top-2 -right-3 bg-teal text-white text-[10px] rounded-full min-w-4 h-4 px-1 flex items-center justify-center">{cartCount}</span>}</span>
               </Link>
             </div>
           </div>
@@ -113,9 +122,9 @@ const Header = () => {
                 className="text-stone-600 hover:text-teal transition-colors duration-200 relative"
               >
                 <ShoppingBag size={20} />
-                <span className="absolute -top-2 -right-2 bg-teal text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  0
-                </span>
+                {cartCount > 0 && <span className="absolute -top-2 -right-2 bg-teal text-white text-xs rounded-full min-w-5 h-5 px-1 flex items-center justify-center">
+                  {cartCount}
+                </span>}
               </Link>
             </div>
           </div>

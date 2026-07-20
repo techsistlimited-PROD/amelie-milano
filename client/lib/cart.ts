@@ -29,7 +29,7 @@ export const writeCart = (items: CartItem[]) => {
 
 export const addToCart = (item: CartItem) => {
   const items = readCart();
-  const existing = items.find((entry) => entry.id === item.id && entry.option === item.option);
+  const existing = items.find((entry) => entry.id === item.id && entry.option === item.option && entry.colour === item.colour);
   if (existing) existing.quantity += item.quantity;
   else items.push(item);
   writeCart(items);
