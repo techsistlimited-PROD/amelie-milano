@@ -45,7 +45,7 @@ const Occasionwear = () => (
     <Header />
     <main>
       <section className="relative min-h-[620px] md:h-[700px] overflow-hidden bg-stone-900 flex items-end">
-        <img src="https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F8ecc599f40e0487a9a970b3aeb611869?format=webp&width=1600&quality=95" alt="Amelie Milano Occasionwear" className="absolute inset-0 w-full h-full object-cover object-center" />
+        <img src="https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F21ada796a3144e7c95cbfbeb0f436fe6?format=webp&width=1800&height=2700&quality=95" alt="Amelie Milano Occasionwear" className="absolute inset-0 w-full h-full object-cover object-center" />
         <div className="absolute inset-0 bg-gradient-to-r from-stone-950/70 via-stone-950/20 to-transparent" />
         <div className="relative z-10 container mx-auto px-4 pb-16 md:pb-20 text-white max-w-7xl"><p className="text-[10px] uppercase tracking-[0.28em] text-white/80 mb-5">Occasionwear</p><h1 className="font-serif text-6xl md:text-8xl leading-[0.86] max-w-2xl mb-6">Elegance For Every Occasion</h1><p className="text-sm md:text-base text-white/80 max-w-md leading-relaxed mb-8">Discover timeless silhouettes designed for life's most unforgettable moments.</p><Link to="#occasion-collection" className="inline-flex border border-white px-6 py-3 text-xs uppercase tracking-[0.16em] hover:bg-white hover:text-stone-900 transition-colors">Explore Collection</Link></div>
       </section>

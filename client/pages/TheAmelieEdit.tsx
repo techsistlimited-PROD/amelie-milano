@@ -4,17 +4,17 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 const stories = [
-  { eyebrow: "Craftsmanship", title: "The Art of Italian Tailoring", copy: "Explore how centuries of fashion heritage inspire every considered stitch in the Amelie collection.", image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F92b67c169b484849bc0557782bc3580b?format=webp&width=1200&quality=95", href: "/journal/italian-tailoring" },
-  { eyebrow: "The Journey", title: "A Wardrobe With A Point Of View", copy: "Meet the textures, silhouettes and places that shape the Amelie Milano woman.", image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Fc09eb3a2d9da4b20b5d3d99979a90b4f?format=webp&width=1200&quality=95", href: "/brand-story" },
-  { eyebrow: "Style Guide", title: "The Modern Occasion Edit", copy: "A study in ease, elegance and the art of dressing for your most memorable moments.", image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F3abee068625f43fbb7ab80d054951ad7?format=webp&width=1200&quality=95", href: "/journal/occasion-edit" },
+  { eyebrow: "Craftsmanship", title: "The Art of Italian Tailoring", copy: "Explore how centuries of fashion heritage inspire every considered stitch in the Amelie collection.", image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F749ba224da2b41678b487eeafd2ca402?format=webp&width=1200&height=1800&quality=95", href: "/journal/italian-tailoring" },
+  { eyebrow: "The Journey", title: "A Wardrobe With A Point Of View", copy: "Meet the textures, silhouettes and places that shape the Amelie Milano woman.", image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F54489f84ad8a4d838e0b5666e939c9fa?format=webp&width=1200&height=1800&quality=95", href: "/brand-story" },
+  { eyebrow: "Style Guide", title: "The Modern Occasion Edit", copy: "A study in ease, elegance and the art of dressing for your most memorable moments.", image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F585986fa98a8468e8e06ad0aa36f815b?format=webp&width=1200&height=1800&quality=95", href: "/journal/occasion-edit" },
 ];
 
 const collections = [
   { label: "Dresses", image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Fd82ccb0930fd4d0e8a2edb49f49368e1?format=webp&width=900&height=1200", href: "/shop/dresses" },
   { label: "Occasionwear", image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Ff2edad5f9989469e9179290f0356a25b?format=webp&width=900&height=1200", href: "/shop/occasionwear" },
-  { label: "Bags", image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=900&h=1200&fit=crop", href: "/shop/bags" },
-  { label: "Shoes", image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F63618dadc38341448c40401de698c1a3?format=webp&width=900&height=1200", href: "/shop/shoes" },
-  { label: "Gym Wear", image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F56076a5843aa49afaee6765ec232fb48?format=webp&width=900&height=1200", href: "/shop/gym-wear" },
+  { label: "Bags", image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F4746df4e3e164a83811678541924e4b4?format=webp&width=1200&height=1800&quality=95", href: "/shop/bags" },
+  { label: "Shoes", image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Fe63ee6385bd84cfe85d6856aee777215?format=webp&width=1200&height=1800&quality=95", href: "/shop/shoes" },
+  { label: "Gym Wear", image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Fdcf230d68b79461a81796291c421c11e?format=webp&width=1200&height=1800&quality=95", href: "/shop/gym-wear" },
 ];
 
 const TheAmelieEdit = () => (
