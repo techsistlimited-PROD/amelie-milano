@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { addToCart } from "@/lib/cart";
 import { useWishlist } from "@/lib/wishlist";
+import { fetchBuilderProduct, isBuilderConfigured, type BuilderProductData } from "@/lib/builder";
 
 const productCatalog = {
   "1": { name: "Espresso Drape Kaftan Dress", price: 8375, category: "Dresses", tagline: "A fluid silhouette with effortless evening movement.", material: "Silk-touch satin", colour: "Espresso", image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Fca01513621cd4cd19c92e5bb2129ea91?format=webp&width=1000&height=1400" },
@@ -43,7 +44,29 @@ const relatedProducts = [
 
 const ProductPage = () => {
   const { id = "1" } = useParams();
-  const product: Product = productCatalog[id as keyof typeof productCatalog] ?? productCatalog["1"];
+  const fallbackProduct: Product = productCatalog[id as keyof typeof productCatalog] ?? productCatalog["1"];
+  const [cmsProduct, setCmsProduct] = useState<BuilderProductData | null>(null);
+
+  useEffect(() => {
+    setCmsProduct(null);
+    if (!isBuilderConfigured) return;
+    fetchBuilderProduct(id).then((result) => {
+      const data = result?.data as BuilderProductData | undefined;
+      if (data) setCmsProduct(data);
+    });
+  }, [id]);
+
+  const product: Product = cmsProduct
+    ? {
+        name: cmsProduct.title,
+        price: cmsProduct.priceBdt,
+        category: cmsProduct.category,
+        tagline: cmsProduct.description ?? "",
+        material: "Amelie Milano signature finish",
+        colour: cmsProduct.variants?.[0]?.color ?? "Signature",
+        image: cmsProduct.heroImage,
+      }
+    : fallbackProduct;
   const [size, setSize] = useState("M");
   const [colour, setColour] = useState(product.colour);
   const { saved, toggle: toggleWishlist } = useWishlist({ id, name: product.name, price: product.price, image: product.image, category: product.category, colour: product.colour, option: size });
