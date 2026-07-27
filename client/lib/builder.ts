@@ -57,6 +57,13 @@ export interface BuilderEditorialData {
   excerpt?: string;
   heroImage?: string;
   type?: string;
+  category?: string;
+  gallery?: string[];
+  author?: string;
+  publishedAt?: string;
+  featured?: boolean;
+  isVisible?: boolean;
+  displayOrder?: number;
   seoTitle?: string;
   seoDescription?: string;
 }
@@ -105,6 +112,16 @@ export const fetchBuilderEditorial = async (slug: string) => {
     apiKey: BUILDER_API_KEY,
     query: { "data.slug": slug },
   });
+};
+
+export const fetchBuilderEditorials = async () => {
+  if (!isBuilderConfigured) return [];
+  const response = await fetch(`https://cdn.builder.io/api/v3/content/${BUILDER_EDITORIAL_MODEL}?apiKey=${BUILDER_API_KEY}&limit=100`);
+  if (!response.ok) return [];
+  const result = await response.json() as { results?: { id: string; data: BuilderEditorialData }[] };
+  return (result.results ?? [])
+    .filter(({ data }) => data.isVisible !== false)
+    .sort((a, b) => (a.data.displayOrder ?? 0) - (b.data.displayOrder ?? 0));
 };
 
 export const fetchBuilderCollection = async (slug: string) => {
