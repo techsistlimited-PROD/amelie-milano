@@ -41,6 +41,7 @@ import Returns from "./pages/Returns";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import BuilderPage from "./pages/BuilderPage";
+import BuilderRouteContent from "./components/BuilderRouteContent";
 
 const queryClient = new QueryClient();
 
@@ -52,7 +53,7 @@ const App = () => (
       <BrowserRouter>
         <SiteMeta />
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<BuilderRouteContent><Index /></BuilderRouteContent>} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/shop/new" element={<NewIn />} />
           <Route path="/shop/occasionwear" element={<Occasionwear />} />
@@ -62,26 +63,26 @@ const App = () => (
           <Route path="/shop/shoes" element={<Shoes />} />
           <Route path="/shop/:category" element={<Category />} />
           <Route path="/product/:id" element={<Product />} />
-          <Route path="/collection/:id" element={<Collection />} />
+          <Route path="/collection/:id" element={<BuilderRouteContent><Collection /></BuilderRouteContent>} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/order-confirmation" element={<OrderConfirmation />} />
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/account" element={<Account />} />
           <Route path="/order-history" element={<OrderHistory />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/brand-story" element={<BrandStory />} />
-          <Route path="/style-concierge" element={<StyleConcierge />} />
+          <Route path="/about" element={<BuilderRouteContent><About /></BuilderRouteContent>} />
+          <Route path="/brand-story" element={<BuilderRouteContent><BrandStory /></BuilderRouteContent>} />
+          <Route path="/style-concierge" element={<BuilderRouteContent><StyleConcierge /></BuilderRouteContent>} />
           <Route path="/journal/:slug" element={<JournalArticle />} />
-          <Route path="/journal/*" element={<Journal />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/faq" element={<FAQ />} />
-          <Route path="/size-guide" element={<SizeGuide />} />
-          <Route path="/shipping" element={<Shipping />} />
-          <Route path="/returns" element={<Returns />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/the-amelie-edit" element={<TheAmelieEdit />} />
+          <Route path="/journal/*" element={<BuilderRouteContent><Journal /></BuilderRouteContent>} />
+          <Route path="/contact" element={<BuilderRouteContent><Contact /></BuilderRouteContent>} />
+          <Route path="/faq" element={<BuilderRouteContent><FAQ /></BuilderRouteContent>} />
+          <Route path="/size-guide" element={<BuilderRouteContent><SizeGuide /></BuilderRouteContent>} />
+          <Route path="/shipping" element={<BuilderRouteContent><Shipping /></BuilderRouteContent>} />
+          <Route path="/returns" element={<BuilderRouteContent><Returns /></BuilderRouteContent>} />
+          <Route path="/privacy" element={<BuilderRouteContent><Privacy /></BuilderRouteContent>} />
+          <Route path="/terms" element={<BuilderRouteContent><Terms /></BuilderRouteContent>} />
+          <Route path="/the-amelie-edit" element={<BuilderRouteContent><TheAmelieEdit /></BuilderRouteContent>} />
           <Route path="/cms/*" element={<BuilderPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
