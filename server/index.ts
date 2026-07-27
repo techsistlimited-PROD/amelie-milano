@@ -5,6 +5,7 @@ import { handleDemo } from "./routes/demo";
 import { handleNewsletterSubscribe } from "./routes/newsletter";
 import { changePassword, getAccount, updateAccount } from "./routes/account";
 import { createOrder, listOrders, requestReturn } from "./routes/orders";
+import { handleContactSubmission, handleStyleConciergeSubmission } from "./routes/submissions";
 
 export function createServer() {
   const app = express();
@@ -22,6 +23,8 @@ export function createServer() {
 
   app.get("/api/demo", handleDemo);
   app.post("/api/newsletter/subscribe", handleNewsletterSubscribe);
+  app.post("/api/contact/submit", handleContactSubmission);
+  app.post("/api/style-concierge/submit", handleStyleConciergeSubmission);
   app.get("/api/account", getAccount);
   app.put("/api/account", updateAccount);
   app.put("/api/account/password", changePassword);

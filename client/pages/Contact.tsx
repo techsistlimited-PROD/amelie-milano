@@ -14,8 +14,9 @@ const contactDetails = [
 const Contact = () => {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = event.currentTarget;
     if (!form.checkValidity()) {
@@ -24,8 +25,18 @@ const Contact = () => {
       return;
     }
     setError("");
-    setSubmitted(true);
-    form.reset();
+    setSubmitting(true);
+    try {
+      const response = await fetch("/api/contact/submit", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(Object.fromEntries(new FormData(form))) });
+      const result = await response.json() as { message?: string };
+      if (!response.ok) throw new Error(result.message || "We could not send your message right now.");
+      setSubmitted(true);
+      form.reset();
+    } catch (submissionError) {
+      setError(submissionError instanceof Error ? submissionError.message : "We could not send your message right now.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -63,7 +74,7 @@ const Contact = () => {
                 <div className="grid gap-4 sm:grid-cols-2"><label className="text-sm text-stone-700">Phone number *<input name="phone" type="tel" required pattern="[+0-9 ()-]{7,}" title="Enter a valid phone number" className="contact-field" placeholder="+880 1XXX-XXXXXX" /></label><label className="text-sm text-stone-700">Subject *<select name="subject" required className="contact-field"><option value="">Choose a subject</option><option>Inquiry</option><option>Feedback</option><option>Complaint</option><option>Collaboration</option></select></label></div>
                 <label className="block text-sm text-stone-700">Message *<textarea name="message" required rows={6} className="contact-field resize-none" placeholder="How can we help?" /></label>
                 {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
-                <button type="submit" className="inline-flex w-full items-center justify-center gap-2 bg-[#0057B8] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#00458f]">Send Message <Send size={16} /></button>
+                <button type="submit" disabled={submitting} className="inline-flex w-full items-center justify-center gap-2 bg-[#0057B8] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#00458f] disabled:cursor-wait disabled:opacity-70">{submitting ? "Sending..." : "Send Message"} <Send size={16} /></button>
                 <p className="text-center text-xs text-stone-500">We typically respond within 24 hours.</p>
               </form>
             </div>

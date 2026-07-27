@@ -22,6 +22,7 @@ export interface BuilderProductData {
   priceBdt: number;
   heroImage: string;
   category: string;
+  isNew?: boolean;
   variants?: { size?: string; color?: string; volume?: string; details?: string }[];
   stylingTips?: string;
 }
@@ -58,4 +59,12 @@ export const fetchBuilderEditorial = async (slug: string) => {
     apiKey: BUILDER_API_KEY,
     query: { "data.slug": slug },
   });
+};
+
+export const fetchBuilderProducts = async () => {
+  if (!isBuilderConfigured) return [];
+  const response = await fetch(`https://cdn.builder.io/api/v3/content/${BUILDER_PRODUCT_MODEL}?apiKey=${BUILDER_API_KEY}&limit=100`);
+  if (!response.ok) return [];
+  const result = await response.json() as { results?: { id: string; data: BuilderProductData }[] };
+  return result.results ?? [];
 };
