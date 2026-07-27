@@ -5,6 +5,20 @@ export const BUILDER_PAGE_MODEL = "page";
 export const BUILDER_PRODUCT_MODEL = "amelie-product";
 export const BUILDER_EDITORIAL_MODEL = "amelie-editorial";
 export const BUILDER_SITE_SECTION_MODEL = "amelie-site-section";
+export const BUILDER_COLLECTION_MODEL = "amelie-collection";
+
+export interface BuilderCollectionData {
+  slug: string;
+  title: string;
+  description?: string;
+  heroImage?: string;
+  images?: string[];
+  editorialCopy?: string;
+  products?: (string | { slug?: string; id?: string })[];
+  featured?: boolean;
+  seoTitle?: string;
+  seoDescription?: string;
+}
 
 export interface BuilderSiteSectionItem {
   label?: string;
@@ -88,6 +102,16 @@ export const fetchBuilderEditorial = async (slug: string) => {
 
   return fetchOneEntry({
     model: BUILDER_EDITORIAL_MODEL,
+    apiKey: BUILDER_API_KEY,
+    query: { "data.slug": slug },
+  });
+};
+
+export const fetchBuilderCollection = async (slug: string) => {
+  if (!isBuilderConfigured) return null;
+
+  return fetchOneEntry({
+    model: BUILDER_COLLECTION_MODEL,
     apiKey: BUILDER_API_KEY,
     query: { "data.slug": slug },
   });
