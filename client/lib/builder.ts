@@ -3,6 +3,17 @@ import { fetchOneEntry } from "@builder.io/sdk-react";
 export const BUILDER_API_KEY = import.meta.env.VITE_PUBLIC_BUILDER_KEY as string;
 export const BUILDER_PAGE_MODEL = "page";
 export const BUILDER_PRODUCT_MODEL = "amelie-product";
+export const BUILDER_EDITORIAL_MODEL = "amelie-editorial";
+
+export interface BuilderEditorialData {
+  slug: string;
+  title: string;
+  excerpt?: string;
+  heroImage?: string;
+  type?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+}
 
 export interface BuilderProductData {
   slug: string;
@@ -34,6 +45,16 @@ export const fetchBuilderProduct = async (slug: string) => {
 
   return fetchOneEntry({
     model: BUILDER_PRODUCT_MODEL,
+    apiKey: BUILDER_API_KEY,
+    query: { "data.slug": slug },
+  });
+};
+
+export const fetchBuilderEditorial = async (slug: string) => {
+  if (!isBuilderConfigured) return null;
+
+  return fetchOneEntry({
+    model: BUILDER_EDITORIAL_MODEL,
     apiKey: BUILDER_API_KEY,
     query: { "data.slug": slug },
   });

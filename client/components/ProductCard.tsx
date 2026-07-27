@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Heart, ShoppingBag } from "lucide-react";
+import { Eye, Heart, ShoppingBag, X } from "lucide-react";
 import { useWishlist } from "@/lib/wishlist";
 import { useNavigate } from "react-router-dom";
 import { addToCart } from "@/lib/cart";
@@ -27,6 +28,7 @@ const ProductCard = ({
 }: ProductCardProps) => {
   const { saved: isWishlisted, toggle: toggleWishlist } = useWishlist({ id, name, price: salePrice ?? price, image, category: "Amelie Milano", colour: "Signature colour", option: "M" });
   const navigate = useNavigate();
+  const [quickViewOpen, setQuickViewOpen] = useState(false);
 
   const handleAddToCart = () => {
     addToCart({ id, name, price: salePrice ?? price, image, category: "Amelie Milano", colour: "Signature colour", option: "M", quantity: 1 });
@@ -77,13 +79,32 @@ const ProductCard = ({
         </button>
 
         {/* Add to Cart Button - Hidden until hover */}
-        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-colors duration-200 flex items-end justify-center pb-4 opacity-0 group-hover:opacity-100">
-          <button onClick={handleAddToCart} className="bg-white text-teal font-medium px-6 py-2 rounded-lg hover:bg-teal hover:text-white transition-colors duration-200 flex items-center gap-2">
+        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-colors duration-200 flex items-end justify-center gap-2 pb-4 opacity-0 group-hover:opacity-100">
+          <button onClick={() => setQuickViewOpen(true)} className="bg-white text-teal font-medium px-4 py-2 rounded-lg hover:bg-teal hover:text-white transition-colors duration-200 flex items-center gap-2">
+            <Eye size={17} />
+            Quick View
+          </button>
+          <button onClick={handleAddToCart} className="bg-white text-teal font-medium px-4 py-2 rounded-lg hover:bg-teal hover:text-white transition-colors duration-200 flex items-center gap-2">
             <ShoppingBag size={18} />
             Add to Cart
           </button>
         </div>
       </div>
+
+      {quickViewOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/60 p-4" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setQuickViewOpen(false); }}>
+          <div role="dialog" aria-modal="true" aria-labelledby={`quick-view-${id}`} className="relative grid w-full max-w-2xl gap-6 bg-white p-5 md:grid-cols-2 md:p-7">
+            <button type="button" aria-label="Close quick view" onClick={() => setQuickViewOpen(false)} className="absolute right-3 top-3 z-10 rounded-full bg-white p-2 text-stone-600 shadow-sm hover:text-teal"><X size={18} /></button>
+            <img src={image} alt={name} loading="lazy" decoding="async" className="aspect-[3/4] w-full object-cover" />
+            <div className="flex flex-col justify-center pr-4">
+              <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-teal">Amelie Milano</p>
+              <h2 id={`quick-view-${id}`} className="font-serif text-3xl text-stone-900">{name}</h2>
+              <p className="mt-4 text-lg text-stone-700">BDT {(salePrice ?? price).toLocaleString()}</p>
+              <button type="button" onClick={() => { setQuickViewOpen(false); navigate(`/product/${id}`); }} className="btn-primary mt-7 inline-flex justify-center">View Product</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Product Info */}
       <div>
