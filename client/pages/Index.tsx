@@ -1,4 +1,6 @@
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { fetchBuilderProducts, fetchBuilderSiteSections, isBuilderConfigured, type BuilderSiteSectionData } from "@/lib/builder";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
@@ -99,33 +101,66 @@ const categories = [
 ];
 
 const Index = () => {
+  const [cmsSections, setCmsSections] = useState<BuilderSiteSectionData[]>([]);
+  const [cmsProducts, setCmsProducts] = useState<Array<{ id: string; name: string; price: number; image: string; isNew?: boolean }>>([]);
+
+  useEffect(() => {
+    if (!isBuilderConfigured) return;
+    fetchBuilderSiteSections().then((entries) => setCmsSections(entries.map((entry) => entry.data)));
+    fetchBuilderProducts().then((entries) => setCmsProducts(entries.map(({ id, data }) => ({
+      id,
+      name: data.title,
+      price: data.priceBdt,
+      image: data.heroImage,
+      isNew: data.isNew ?? false,
+    }))));
+  }, []);
+
+  const sections = useMemo(() => new Map(cmsSections.map((section) => [section.key, section])), [cmsSections]);
+  const getSection = (key: string) => sections.get(key);
+  const sectionVisible = (key: string) => getSection(key)?.isVisible !== false;
+  const homepageCategories = getSection("homepage-categories")?.items?.length
+    ? getSection("homepage-categories")?.items?.map((item) => typeof item === "string" ? { name: item, image: "", href: "#" } : { name: item.name ?? item.label ?? item.title ?? "", image: item.image ?? "", href: item.href ?? item.url ?? "#" })
+    : categories;
+  const productsForSection = (key: string, fallback: Array<{ id: string; name: string; price: number; image: string; isNew?: boolean }>) => {
+    const section = getSection(key);
+    const references = section?.productReferences?.length ? section.productReferences : section?.items?.filter((item): item is string => typeof item === "string");
+    if (!references?.length || !cmsProducts.length) return fallback;
+    const products = cmsProducts.filter((product) => references.includes(product.id));
+    return products.length ? products : fallback;
+  };
+  const homepageNewArrivals = productsForSection("homepage-new-arrivals", newArrivals);
+  const homepageBestSellers = productsForSection("homepage-best-sellers", bestSellers);
+  const hero = getSection("homepage-hero");
+  const brandPromise = getSection("homepage-brand-promise");
+
   return (
     <div className="min-h-screen bg-ivory">
       <Header />
 
       {/* Hero Section */}
-      <section className="relative aspect-[4/3] md:aspect-[3/1] flex items-center justify-center overflow-hidden bg-stone-950">
+      <section className={`${sectionVisible("homepage-hero") ? "" : "hidden"} relative aspect-[4/3] md:aspect-[3/1] flex items-center justify-center overflow-hidden bg-stone-950`}>
         <img
-          src="https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F41503ed6b6384ec098bdd9f6977128f5?format=webp&width=2000&quality=95"
-          alt="Italian Elegance. Bengali Soul."
+          src={hero?.heroImage || "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F41503ed6b6384ec098bdd9f6977128f5?format=webp&width=2000&quality=95"}
+          alt={hero?.title || "Italian Elegance. Bengali Soul."}
           className="absolute inset-0 w-full h-full object-cover object-center"
         />
       </section>
 
       {/* Shop by Category */}
-      <section className="bg-white py-8 md:py-12">
+      <section className={`${sectionVisible("homepage-categories") ? "" : "hidden"} bg-white py-8 md:py-12`}>
         <div className="container mx-auto px-4">
           <div className="text-center mb-8">
             <h2 className="text-2xl md:text-3xl font-serif font-semibold text-stone-900 mb-2">
-              Shop by Category
+              {getSection("homepage-categories")?.title || "Shop by Category"}
             </h2>
             <p className="text-stone-600 text-sm max-w-lg mx-auto">
-              Explore our curated collections designed for every occasion and lifestyle
+              {getSection("homepage-categories")?.body || "Explore our curated collections designed for every occasion and lifestyle"}
             </p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-5 lg:gap-4">
-            {categories.map((cat) => (
+            {homepageCategories.map((cat) => (
               <CategoryCardSimple key={cat.name} {...cat} />
             ))}
           </div>
@@ -133,12 +168,12 @@ const Index = () => {
       </section>
 
       {/* New Arrivals */}
-      <section className="section-spacing bg-white">
+      <section className={`${sectionVisible("homepage-new-arrivals") ? "" : "hidden"} section-spacing bg-white`}>
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-12">
             <div>
-              <h2 className="text-heading text-stone-900 mb-2">New Arrivals</h2>
-              <p className="text-stone-600">Discover what's trending this season</p>
+              <h2 className="text-heading text-stone-900 mb-2">{getSection("homepage-new-arrivals")?.title || "New Arrivals"}</h2>
+              <p className="text-stone-600">{getSection("homepage-new-arrivals")?.body || "Discover what's trending this season"}</p>
             </div>
             <Link to="/shop/new" className="hidden md:flex items-center gap-2 text-teal hover:text-teal-dark transition-colors">
               View All <ChevronRight size={20} />
@@ -146,7 +181,7 @@ const Index = () => {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
-            {newArrivals.map((product) => (
+            {homepageNewArrivals.map((product) => (
               <ProductCard key={product.id} {...product} />
             ))}
           </div>
@@ -160,7 +195,7 @@ const Index = () => {
       </section>
 
       {/* Brand Promise Section */}
-      <section className="section-spacing bg-gradient-to-r from-teal-50 to-cream">
+      <section className={`${sectionVisible("homepage-brand-promise") ? "" : "hidden"} section-spacing bg-gradient-to-r from-teal-50 to-cream`}>
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8 md:gap-12">
             <div className="text-center">
@@ -189,7 +224,7 @@ const Index = () => {
       </section>
 
       {/* Occasionwear Feature */}
-      <section className="section-spacing bg-white">
+      <section className={`${sectionVisible("homepage-occasionwear") ? "" : "hidden"} section-spacing bg-white`}>
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
             <div>
@@ -197,10 +232,10 @@ const Index = () => {
                 Special Collection
               </p>
               <h2 className="text-heading text-stone-900 mb-6">
-                Occasion Wear Collection
+                {getSection("homepage-occasionwear")?.title || "Occasion Wear Collection"}
               </h2>
               <p className="text-stone-600 mb-6 leading-relaxed">
-                From intimate gatherings to grand celebrations, our Occasionwear collection offers timeless elegance for every special moment. Each piece is designed to make you feel confident, beautiful, and unforgettable.
+                {getSection("homepage-occasionwear")?.body || "From intimate gatherings to grand celebrations, our Occasionwear collection offers timeless elegance for every special moment. Each piece is designed to make you feel confident, beautiful, and unforgettable."}
               </p>
               <ul className="space-y-3 mb-8 text-sm text-stone-600">
                 <li className="flex items-start gap-3">
@@ -222,8 +257,8 @@ const Index = () => {
             </div>
             <div className="relative h-96 md:h-full rounded-lg overflow-hidden">
               <img
-                src="https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Fa040fefdb8b84ba48c5f3f10f68cf2db?format=webp&width=1600&quality=90"
-                alt="Occasionwear"
+                src={getSection("homepage-occasionwear")?.heroImage || "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Fa040fefdb8b84ba48c5f3f10f68cf2db?format=webp&width=1600&quality=90"}
+                alt={getSection("homepage-occasionwear")?.title || "Occasionwear"}
                 className="w-full h-full object-cover"
               />
             </div>
@@ -232,7 +267,7 @@ const Index = () => {
       </section>
 
       {/* The Amelie Edit Editorial Section */}
-      <section className="section-spacing bg-ivory">
+      <section className={`${sectionVisible("homepage-editorial") ? "" : "hidden"} section-spacing bg-ivory`}>
         <div className="container mx-auto px-4">
           <div className="text-center max-w-2xl mx-auto mb-14 md:mb-20">
             <p className="text-teal text-[10px] font-semibold uppercase tracking-[0.24em] mb-3">
@@ -297,7 +332,7 @@ const Index = () => {
       </section>
 
       {/* Best Sellers */}
-      <section className="section-spacing bg-white">
+      <section className={`${sectionVisible("homepage-best-sellers") ? "" : "hidden"} section-spacing bg-white`}>
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-12">
             <div>
@@ -324,7 +359,7 @@ const Index = () => {
       </section>
 
       {/* Style Concierge */}
-      <section className="section-spacing bg-gradient-to-r from-teal-50 via-cream to-teal-50">
+      <section className={`${sectionVisible("homepage-style-concierge") ? "" : "hidden"} section-spacing bg-gradient-to-r from-teal-50 via-cream to-teal-50`}>
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto text-center">
             <p className="text-teal font-medium text-sm tracking-wider uppercase mb-4">
@@ -375,7 +410,7 @@ const Index = () => {
       </section>
 
       {/* Body Care & Lifestyle */}
-      <section className="section-spacing bg-white">
+      <section className={`${sectionVisible("homepage-body-care") ? "" : "hidden"} section-spacing bg-white`}>
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
             <div className="relative h-96 md:h-full rounded-lg overflow-hidden">
@@ -418,7 +453,7 @@ const Index = () => {
       </section>
 
       {/* Instagram Feed Section */}
-      <section className="section-spacing bg-gradient-to-b from-cream to-ivory">
+      <section className={`${sectionVisible("homepage-instagram") ? "" : "hidden"} section-spacing bg-gradient-to-b from-cream to-ivory`}>
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <p className="text-teal font-medium text-sm tracking-wider uppercase mb-4">
