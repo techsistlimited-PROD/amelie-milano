@@ -7,7 +7,7 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import { cartSubtotal, readCart, writeCart, type CartItem } from "@/lib/cart";
 import { createOrder, orderTax, syncOrder, type DeliveryAddress } from "@/lib/orders";
 import { initiatePayment } from "@/lib/payments";
-import { readSession, requestPhoneOtp, signInWithEmail, signInWithOAuth, signUpWithEmail, verifyPhoneOtp, type AuthUser } from "@/lib/auth";
+import { authEventName, readSession, requestPhoneOtp, signInWithEmail, signInWithOAuth, signUpWithEmail, verifyPhoneOtp, type AuthUser } from "@/lib/auth";
 
 const initialAddress: DeliveryAddress = { firstName: "", lastName: "", email: "", phone: "", address: "", city: "", postalCode: "" };
 const paymentOptions = [["card", "Credit / Debit Card"], ["bkash", "bKash"], ["net", "Net Banking"], ["qr", "Bangla QR"], ["cod", "Cash on Delivery"]];
@@ -25,13 +25,17 @@ const AuthModal = ({ onAuthenticated, onGuest }: { onAuthenticated: (user: AuthU
   const [otpSent, setOtpSent] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
-  const submitEmail = (event: FormEvent<HTMLFormElement>) => {
+  const submitEmail = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    try { onAuthenticated(mode === "signup" ? signUpWithEmail(email, password, firstName, lastName) : signInWithEmail(email, password)); } catch (err) { setError(err instanceof Error ? err.message : "Unable to authenticate."); }
+    try {
+      const user = await (mode === "signup" ? signUpWithEmail(email, password, firstName, lastName) : signInWithEmail(email, password));
+      if (!user) throw new Error("Check your email to confirm your new account before signing in.");
+      onAuthenticated(user);
+    } catch (err) { setError(err instanceof Error ? err.message : "Unable to authenticate."); }
   };
-  const sendOtp = () => { if (!phone.trim()) { setError("Enter a phone number first."); return; } requestPhoneOtp(phone); setOtpSent(true); setError(""); setNotice("Your verification code has been sent. Enter it below to continue."); };
-  const verifyOtp = (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); try { onAuthenticated(verifyPhoneOtp(phone, otp)); } catch (err) { setError(err instanceof Error ? err.message : "Unable to verify OTP."); } };
-  const oauth = (provider: "google" | "facebook") => { try { signInWithOAuth(provider); } catch (err) { setError(err instanceof Error ? err.message : "This sign-in method is unavailable."); } };
+  const sendOtp = async () => { if (!phone.trim()) { setError("Enter a phone number first."); return; } try { await requestPhoneOtp(phone); setOtpSent(true); setError(""); setNotice("Your verification code has been sent. Enter it below to continue."); } catch (err) { setError(err instanceof Error ? err.message : "Unable to send the verification code."); } };
+  const verifyOtp = async (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); try { const user = await verifyPhoneOtp(phone, otp); if (!user) throw new Error("Unable to create your phone session."); onAuthenticated(user); } catch (err) { setError(err instanceof Error ? err.message : "Unable to verify OTP."); } };
+  const oauth = async (provider: "google" | "facebook") => { try { await signInWithOAuth(provider); } catch (err) { setError(err instanceof Error ? err.message : "This sign-in method is unavailable."); } };
   return <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/50 px-4 py-6"><div role="dialog" aria-modal="true" aria-labelledby="checkout-auth-title" className="relative max-h-[calc(100vh-3rem)] w-full max-w-md overflow-y-auto bg-[#F9F5F1] p-6 shadow-2xl md:p-8"><div className="mb-7 text-center"><p className="mb-2 text-[10px] uppercase tracking-[0.24em] text-teal">Amelie Milano private checkout</p><h2 id="checkout-auth-title" className="font-serif text-3xl">Sign in to continue</h2><p className="mt-2 text-sm text-stone-600">Save your details and follow every considered order.</p></div><div className="grid grid-cols-2 gap-3"><button type="button" onClick={() => oauth("google")} className="border border-stone-300 bg-white px-3 py-3 text-sm hover:border-teal hover:text-teal">Continue with Google</button><button type="button" onClick={() => oauth("facebook")} className="border border-stone-300 bg-white px-3 py-3 text-sm hover:border-teal hover:text-teal">Continue with Facebook</button></div><div className="my-6 flex items-center gap-3 text-[10px] uppercase tracking-[0.16em] text-stone-400"><span className="h-px flex-1 bg-stone-200" />or<span className="h-px flex-1 bg-stone-200" /></div>{mode === "phone" ? <form onSubmit={verifyOtp} className="space-y-4">{!otpSent ? <><input required type="tel" placeholder="Phone number" value={phone} onChange={(event) => setPhone(event.target.value)} className="field w-full" /><button type="button" onClick={sendOtp} className="btn-primary w-full">Send OTP</button></> : <><input required inputMode="numeric" placeholder="6-digit OTP" value={otp} onChange={(event) => setOtp(event.target.value)} className="field w-full" /><button type="submit" className="btn-primary w-full">Verify OTP</button><button type="button" onClick={() => { setOtpSent(false); setNotice(""); }} className="w-full text-xs uppercase tracking-[0.14em] text-teal">Use a different number</button></>}</form> : <form onSubmit={submitEmail} className="space-y-4">{mode === "signup" && <div className="grid grid-cols-2 gap-3"><input required placeholder="First name" value={firstName} onChange={(event) => setFirstName(event.target.value)} className="field" /><input required placeholder="Last name" value={lastName} onChange={(event) => setLastName(event.target.value)} className="field" /></div>}<input required type="email" placeholder="Email address" value={email} onChange={(event) => setEmail(event.target.value)} className="field w-full" /><input required type="password" minLength={8} placeholder="Password (8+ characters)" value={password} onChange={(event) => setPassword(event.target.value)} className="field w-full" /><button type="submit" className="btn-primary w-full">{mode === "signup" ? "Create account" : "Sign in"}</button></form>}{error && <p role="alert" className="mt-4 text-center text-sm text-red-700">{error}</p>}{notice && <p className="mt-4 text-center text-sm text-teal">{notice}</p>}<div className="mt-6 flex flex-wrap justify-center gap-x-4 gap-y-3 text-xs text-stone-600">{mode !== "phone" && <button type="button" onClick={() => { setMode("phone"); setError(""); }} className="text-teal underline">Use phone + OTP</button>}{mode === "phone" && <button type="button" onClick={() => { setMode("signin"); setOtpSent(false); setError(""); }} className="text-teal underline">Use email</button>}{mode !== "phone" && <button type="button" onClick={() => { setMode(mode === "signin" ? "signup" : "signin"); setError(""); }} className="text-teal underline">{mode === "signin" ? "Create an account" : "Already have an account? Sign in"}</button>}</div><button type="button" onClick={onGuest} className="mt-6 w-full border border-stone-300 px-4 py-3 text-xs uppercase tracking-[0.16em] text-stone-600 hover:border-teal hover:text-teal">Continue as Guest</button></div></div>;
 };
 
@@ -48,6 +52,11 @@ const Checkout = () => {
   const [showAuth, setShowAuth] = useState(() => !readSession());
 
   useEffect(() => setItems(readCart()), []);
+  useEffect(() => {
+    const syncAuth = () => { const user = readSession(); setAuthUser(user); if (user) setShowAuth(false); };
+    window.addEventListener(authEventName, syncAuth);
+    return () => window.removeEventListener(authEventName, syncAuth);
+  }, []);
   useEffect(() => {
     if (!authUser) return;
     setAddress((current) => ({ ...current, firstName: current.firstName || authUser.firstName, lastName: current.lastName || authUser.lastName, email: current.email || authUser.email, phone: current.phone || authUser.phone }));

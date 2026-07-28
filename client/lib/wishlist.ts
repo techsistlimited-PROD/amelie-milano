@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { getAccessToken } from "./auth";
 
 export interface WishlistItem {
   id: string;
@@ -32,6 +33,20 @@ export const toggleWishlist = (item: WishlistItem) => {
   return next.some((entry) => entry.id === item.id);
 };
 export const wishlistEventName = WISHLIST_EVENT;
+
+export const syncWishlist = async () => {
+  const token = await getAccessToken();
+  if (!token) return readWishlist();
+  const headers = { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
+  const response = await fetch("/api/wishlist", { headers });
+  if (!response.ok) throw new Error("Unable to load wishlist.");
+  const remote = await response.json() as WishlistItem[];
+  const merged = [...remote, ...readWishlist().filter((item) => !remote.some((entry) => entry.id === item.id))];
+  const saved = await fetch("/api/wishlist", { method: "PUT", headers, body: JSON.stringify({ items: merged }) });
+  if (!saved.ok) throw new Error("Unable to save wishlist.");
+  writeWishlist(merged);
+  return merged;
+};
 
 export const useWishlist = (item: WishlistItem) => {
   const [saved, setSaved] = useState(() => isWishlisted(item.id));

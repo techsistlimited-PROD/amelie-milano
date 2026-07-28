@@ -1,6 +1,14 @@
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
 
+export const getSupabaseUserId = async (authorization?: string) => {
+  if (!supabaseUrl || !supabaseKey || !authorization?.startsWith("Bearer ")) return null;
+  const response = await fetch(`${supabaseUrl}/auth/v1/user`, { headers: { apikey: supabaseKey, Authorization: authorization } });
+  if (!response.ok) return null;
+  const user = await response.json() as { id?: string };
+  return user.id || null;
+};
+
 export const insertSupabaseRow = async (table: string, payload: Record<string, unknown>) => {
   if (!supabaseUrl || !supabaseKey) {
     throw new Error("Supabase is not configured.");

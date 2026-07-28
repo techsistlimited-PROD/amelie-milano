@@ -1,4 +1,5 @@
 import type { OrderRecord } from "./orders";
+import { getAccessToken } from "./auth";
 
 export type PaymentState = "pending" | "initiated" | "successful" | "failed" | "cancelled";
 
@@ -9,9 +10,10 @@ export interface PaymentInitiationResponse {
 }
 
 export const initiatePayment = async (order: OrderRecord, userId = "guest") => {
+  const token = await getAccessToken();
   const response = await fetch("/api/payments/initiate", {
     method: "POST",
-    headers: { "Content-Type": "application/json", "x-user-id": userId },
+    headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}), "x-user-id": userId },
     body: JSON.stringify({
       orderNumber: order.number,
       amount: order.total,

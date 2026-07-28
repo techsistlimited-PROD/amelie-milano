@@ -1,4 +1,5 @@
 import type { RequestHandler } from "express";
+import { getSupabaseUserId } from "../lib/supabase";
 
 interface AccountRecord {
   profile: { firstName: string; lastName: string; email: string; phone: string };
@@ -21,12 +22,18 @@ const accountFor = (id: string, req: Parameters<RequestHandler>[0]): AccountReco
   return record;
 };
 
-const userId = (req: Parameters<RequestHandler>[0]) => String(req.headers["x-user-id"] || "guest");
+const authenticatedId = async (req: Parameters<RequestHandler>[0]) => getSupabaseUserId(req.headers.authorization);
 
-export const getAccount: RequestHandler = (req, res) => res.json(accountFor(userId(req), req));
+export const getAccount: RequestHandler = async (req, res) => {
+  const id = await authenticatedId(req);
+  if (!id) { res.status(401).json({ message: "Authentication required." }); return; }
+  res.json(accountFor(id, req));
+};
 
-export const updateAccount: RequestHandler = (req, res) => {
-  const account = accountFor(userId(req), req);
+export const updateAccount: RequestHandler = async (req, res) => {
+  const id = await authenticatedId(req);
+  if (!id) { res.status(401).json({ message: "Authentication required." }); return; }
+  const account = accountFor(id, req);
   const body = req.body || {};
   if (body.profile) account.profile = { ...account.profile, ...body.profile };
   if (Array.isArray(body.addresses)) account.addresses = body.addresses;
@@ -35,12 +42,13 @@ export const updateAccount: RequestHandler = (req, res) => {
   res.json(account);
 };
 
-export const changePassword: RequestHandler = (req, res) => {
-  const current = String(req.body?.currentPassword || "");
+export const changePassword: RequestHandler = async (req, res) => {
+  const id = await authenticatedId(req);
+  if (!id) { res.status(401).json({ message: "Authentication required." }); return; }
   const next = String(req.body?.newPassword || "");
-  if (!current || next.length < 8) {
-    res.status(400).json({ message: "Enter your current password and a new password of at least 8 characters." });
+  if (next.length < 8) {
+    res.status(400).json({ message: "Enter a new password of at least 8 characters." });
     return;
   }
-  res.json({ message: "Password updated successfully." });
+  res.json({ message: "Password changes must be completed through Supabase Auth." });
 };

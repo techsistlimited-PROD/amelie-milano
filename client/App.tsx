@@ -42,6 +42,8 @@ import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import BuilderPage from "./pages/BuilderPage";
 import BuilderRouteContent from "./components/BuilderRouteContent";
+import AuthBootstrap from "./components/AuthBootstrap";
+import AuthCallback from "./pages/AuthCallback";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +53,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <AuthBootstrap />
         <SiteMeta />
         <Routes>
           <Route path="/" element={<BuilderRouteContent><Index /></BuilderRouteContent>} />
@@ -67,6 +70,7 @@ const App = () => (
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/order-confirmation" element={<OrderConfirmation />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/account" element={<Account />} />
           <Route path="/order-history" element={<OrderHistory />} />

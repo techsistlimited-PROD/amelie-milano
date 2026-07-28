@@ -4,7 +4,8 @@ import cors from "cors";
 import { handleDemo } from "./routes/demo";
 import { handleNewsletterSubscribe } from "./routes/newsletter";
 import { changePassword, getAccount, updateAccount } from "./routes/account";
-import { createOrder, listOrders, requestReturn } from "./routes/orders";
+import { claimGuestOrders, createOrder, listOrders, requestReturn } from "./routes/orders";
+import { getWishlist, saveWishlist } from "./routes/wishlist";
 import { handleContactSubmission, handleStyleConciergeSubmission } from "./routes/submissions";
 import { getPayment, handlePaymentCancel, handlePaymentFailure, handlePaymentIpn, handlePaymentSuccess, initiatePayment } from "./routes/payments";
 
@@ -31,7 +32,10 @@ export function createServer() {
   app.put("/api/account/password", changePassword);
   app.get("/api/orders", listOrders);
   app.post("/api/orders", createOrder);
+  app.post("/api/orders/claim-guest", claimGuestOrders);
   app.patch("/api/orders/:number/return", requestReturn);
+  app.get("/api/wishlist", getWishlist);
+  app.put("/api/wishlist", saveWishlist);
   app.post("/api/payments/initiate", initiatePayment);
   app.get("/api/payments/:transactionId", getPayment);
   app.post("/api/payments/sslcommerz/success", handlePaymentSuccess);

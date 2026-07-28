@@ -1,3 +1,6 @@
+import type { AuthChangeEvent, Session, User } from "@supabase/supabase-js";
+import { isSupabaseConfigured, supabase } from "./supabase";
+
 export interface AuthUser {
   id: string;
   email: string;
@@ -7,61 +10,108 @@ export interface AuthUser {
   provider: "email" | "phone" | "google" | "facebook";
 }
 
-const SESSION_KEY = "amelie-milano-session";
-const ACCOUNTS_KEY = "amelie-milano-accounts";
-const OTP_KEY = "amelie-milano-otp";
+let currentUser: AuthUser | null = null;
+const AUTH_EVENT = "amelie-auth-updated";
 
-const readAccounts = (): Record<string, { user: AuthUser; password: string }> => {
-  if (typeof window === "undefined") return {};
-  try { return JSON.parse(window.localStorage.getItem(ACCOUNTS_KEY) || "{}"); } catch { return {}; }
+const providerFromUser = (user: User): AuthUser["provider"] => {
+  const provider = user.app_metadata?.provider || user.identities?.[0]?.provider;
+  if (provider === "phone") return "phone";
+  if (provider === "google") return "google";
+  if (provider === "facebook") return "facebook";
+  return "email";
 };
 
-export const readSession = (): AuthUser | null => {
-  if (typeof window === "undefined") return null;
-  try { return JSON.parse(window.localStorage.getItem(SESSION_KEY) || "null"); } catch { return null; }
+export const authUserFromSupabase = (user: User | null): AuthUser | null => {
+  if (!user) return null;
+  const metadata = user.user_metadata || {};
+  const fullName = String(metadata.full_name || metadata.name || "").trim().split(/\s+/).filter(Boolean);
+  return {
+    id: user.id,
+    email: user.email || "",
+    firstName: String(metadata.first_name || fullName[0] || ""),
+    lastName: String(metadata.last_name || fullName.slice(1).join(" ") || ""),
+    phone: user.phone || String(metadata.phone || ""),
+    provider: providerFromUser(user),
+  };
 };
 
-const saveSession = (user: AuthUser) => {
-  window.localStorage.setItem(SESSION_KEY, JSON.stringify(user));
-  window.dispatchEvent(new Event("amelie-auth-updated"));
-  return user;
+const requireSupabase = () => {
+  if (!isSupabaseConfigured || !supabase) throw new Error("Supabase Authentication is not configured for this storefront.");
+  return supabase;
 };
 
-export const signUpWithEmail = (email: string, password: string, firstName: string, lastName: string) => {
-  const accounts = readAccounts();
-  const key = email.trim().toLowerCase();
-  if (accounts[key]) throw new Error("An account with this email already exists.");
-  const user: AuthUser = { id: `email-${Date.now()}`, email: key, firstName: firstName.trim(), lastName: lastName.trim(), phone: "", provider: "email" };
-  accounts[key] = { user, password };
-  window.localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
-  return saveSession(user);
+const publishUser = (user: User | null) => {
+  currentUser = authUserFromSupabase(user);
+  if (typeof window !== "undefined") window.dispatchEvent(new Event(AUTH_EVENT));
+  return currentUser;
 };
 
-export const signInWithEmail = (email: string, password: string) => {
-  const account = readAccounts()[email.trim().toLowerCase()];
-  if (!account || account.password !== password) throw new Error("Incorrect email or password.");
-  return saveSession(account.user);
+export const readSession = () => currentUser;
+
+export const initializeAuth = async () => {
+  if (!supabase) return null;
+  const { data, error } = await supabase.auth.getSession();
+  if (error) throw error;
+  return publishUser(data.session?.user || null);
 };
 
-export const requestPhoneOtp = (phone: string) => {
-  const otp = String(Math.floor(100000 + Math.random() * 900000));
-  window.localStorage.setItem(OTP_KEY, JSON.stringify({ phone, otp, expiresAt: Date.now() + 5 * 60 * 1000 }));
+export const subscribeToAuth = (callback: (user: AuthUser | null, event: AuthChangeEvent) => void) => {
+  if (!supabase) return () => undefined;
+  const { data } = supabase.auth.onAuthStateChange((event, session) => {
+    const user = publishUser(session?.user || null);
+    callback(user, event);
+  });
+  return () => data.subscription.unsubscribe();
 };
 
-export const verifyPhoneOtp = (phone: string, otp: string) => {
-  let record: { phone: string; otp: string; expiresAt: number } | null = null;
-  try { record = JSON.parse(window.localStorage.getItem(OTP_KEY) || "null"); } catch { record = null; }
-  if (!record || record.phone !== phone || record.otp !== otp || record.expiresAt < Date.now()) throw new Error("That OTP is invalid or has expired.");
-  const user: AuthUser = { id: `phone-${phone}`, email: "", firstName: "", lastName: "", phone, provider: "phone" };
-  window.localStorage.removeItem(OTP_KEY);
-  return saveSession(user);
+export const authEventName = AUTH_EVENT;
+
+export const getAccessToken = async () => {
+  if (!supabase) return null;
+  const { data } = await supabase.auth.getSession();
+  return data.session?.access_token || null;
 };
 
-export const continueAsGuest = () => {
-  window.localStorage.setItem(SESSION_KEY, JSON.stringify(null));
-  window.dispatchEvent(new Event("amelie-auth-updated"));
+export const signUpWithEmail = async (email: string, password: string, firstName: string, lastName: string) => {
+  const client = requireSupabase();
+  const { data, error } = await client.auth.signUp({
+    email: email.trim().toLowerCase(),
+    password,
+    options: { data: { first_name: firstName.trim(), last_name: lastName.trim(), full_name: `${firstName.trim()} ${lastName.trim()}`.trim() } },
+  });
+  if (error) throw error;
+  return publishUser(data.user);
 };
 
-export const signInWithOAuth = (provider: "google" | "facebook") => {
-  throw new Error(`${provider === "google" ? "Google" : "Facebook"} OAuth is not configured for this storefront.`);
+export const signInWithEmail = async (email: string, password: string) => {
+  const client = requireSupabase();
+  const { data, error } = await client.auth.signInWithPassword({ email: email.trim().toLowerCase(), password });
+  if (error) throw error;
+  return publishUser(data.user);
+};
+
+export const requestPhoneOtp = async (phone: string) => {
+  const client = requireSupabase();
+  const { error } = await client.auth.signInWithOtp({ phone: phone.trim() });
+  if (error) throw error;
+};
+
+export const verifyPhoneOtp = async (phone: string, otp: string) => {
+  const client = requireSupabase();
+  const { data, error } = await client.auth.verifyOtp({ phone: phone.trim(), token: otp.trim(), type: "sms" });
+  if (error) throw error;
+  return publishUser(data.user);
+};
+
+export const signInWithOAuth = async (provider: "google" | "facebook") => {
+  const client = requireSupabase();
+  const { error } = await client.auth.signInWithOAuth({ provider, options: { redirectTo: `${window.location.origin}/auth/callback` } });
+  if (error) throw error;
+};
+
+export const signOut = async () => {
+  const client = requireSupabase();
+  const { error } = await client.auth.signOut();
+  if (error) throw error;
+  publishUser(null);
 };
