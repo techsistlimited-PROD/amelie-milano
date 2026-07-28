@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { cartSubtotal, readCart, writeCart, type CartItem } from "@/lib/cart";
 import { createOrder, orderTax, syncOrder, type DeliveryAddress } from "@/lib/orders";
+import { initiatePayment } from "@/lib/payments";
 import { readSession, requestPhoneOtp, signInWithEmail, signInWithOAuth, signUpWithEmail, verifyPhoneOtp, type AuthUser } from "@/lib/auth";
 
 const initialAddress: DeliveryAddress = { firstName: "", lastName: "", email: "", phone: "", address: "", city: "", postalCode: "" };
@@ -69,10 +70,19 @@ const Checkout = () => {
       return;
     }
     setPaymentError("");
-    const order = createOrder({ items, address, delivery, payment, subtotal, discount: 0, shipping, tax, total });
-    await syncOrder(order, authUser?.id || "guest");
-    writeCart([]);
-    navigate(`/order-confirmation?order=${encodeURIComponent(order.number)}`);
+    try {
+      const order = createOrder({ items, address, delivery, payment, subtotal, discount: 0, shipping, tax, total });
+      await syncOrder(order, authUser?.id || "guest");
+      const paymentSession = await initiatePayment(order, authUser?.id || "guest");
+      writeCart([]);
+      if (paymentSession.redirectUrl.startsWith("/")) {
+        navigate(paymentSession.redirectUrl);
+      } else {
+        window.location.assign(paymentSession.redirectUrl);
+      }
+    } catch (error) {
+      setPaymentError(error instanceof Error ? error.message : "Unable to start payment. Please try again.");
+    }
   };
 
   if (!items.length) return <div className="min-h-screen bg-[#F9F5F1]"><Header /><main className="container mx-auto px-4 py-24 text-center"><h1 className="font-serif text-5xl mb-4">Your checkout is empty</h1><p className="text-stone-600 mb-8">Add a signature piece before continuing.</p><Link to="/shop/new" className="btn-primary inline-flex">Explore New Arrivals</Link></main><Footer /></div>;

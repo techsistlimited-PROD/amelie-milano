@@ -25,6 +25,9 @@ export interface OrderRecord extends OrderTotals {
   address: DeliveryAddress;
   delivery: "regular" | "express" | "store";
   payment: string;
+  status?: "Pending" | "Confirmed" | "Processing" | "Packed" | "Shipped" | "Delivered" | "Cancelled" | "Returned";
+  paymentState?: "pending" | "initiated" | "successful" | "failed" | "cancelled";
+  paymentTransactionId?: string;
   returnRequested?: boolean;
 }
 
