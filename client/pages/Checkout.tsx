@@ -81,8 +81,8 @@ const Checkout = () => {
     setPaymentError("");
     try {
       const order = createOrder({ items, address, delivery, payment, subtotal, discount: 0, shipping, tax, total });
-      await syncOrder(order, authUser?.id || "guest");
-      const paymentSession = await initiatePayment(order, authUser?.id || "guest");
+      const syncedOrder = await syncOrder(order, authUser?.id || "guest");
+      const paymentSession = await initiatePayment(syncedOrder, authUser?.id || "guest");
       writeCart([]);
       if (paymentSession.redirectUrl.startsWith("/")) {
         navigate(paymentSession.redirectUrl);

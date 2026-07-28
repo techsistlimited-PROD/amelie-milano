@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight, Heart, Minus, Plus, ShoppingBag } from "lucide-react";
 import { addToCart } from "@/lib/cart";
@@ -6,6 +6,7 @@ import NewsletterForm from "@/components/NewsletterForm";
 import { useWishlist } from "@/lib/wishlist";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { fetchBuilderProducts, isBuilderConfigured } from "@/lib/builder";
 
 const newInProducts = [
   {
@@ -89,8 +90,16 @@ const NewInProductCard = ({ product }: { product: (typeof newInProducts)[number]
   );
 };
 
-const NewIn = () => (
-  <div className="min-h-screen bg-ivory">
+const NewIn = () => {
+  const [products, setProducts] = useState(newInProducts);
+  useEffect(() => {
+    if (!isBuilderConfigured) return;
+    fetchBuilderProducts().then((entries) => {
+      const next = entries.filter(({ data }) => data.isNew).map(({ id, data }) => ({ id, name: data.title, price: data.priceBdt, image: data.heroImage }));
+      if (next.length) setProducts(next);
+    });
+  }, []);
+  return <div className="min-h-screen bg-ivory">
     <Header />
     <main>
       <section className="relative min-h-[620px] md:h-[700px] flex items-end overflow-hidden bg-stone-900">
@@ -126,7 +135,7 @@ const NewIn = () => (
       <section id="latest-arrivals" className="bg-ivory py-16 md:py-24">
         <div className="container mx-auto px-4">
           <div className="mb-10 text-center"><p className="text-teal text-[10px] font-semibold uppercase tracking-[0.24em] mb-3">The newest pieces</p><h2 className="font-serif text-4xl md:text-5xl text-stone-900 mb-3">Latest Arrivals</h2><p className="text-sm text-stone-600">Explore the newest pieces from Amelie Milano.</p></div>
-          <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4 md:gap-x-6 md:gap-y-14">{newInProducts.map((product) => <NewInProductCard key={product.id} product={product} />)}</div>
+          <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4 md:gap-x-6 md:gap-y-14">{products.map((product) => <NewInProductCard key={product.id} product={product} />)}</div>
         </div>
       </section>
 
@@ -135,7 +144,7 @@ const NewIn = () => (
       <section className="bg-beige/70 py-16 md:py-24"><div className="container mx-auto px-4 text-center max-w-2xl"><p className="text-teal text-[10px] font-semibold uppercase tracking-[0.26em] mb-5">Amelie Milano</p><h2 className="font-serif text-4xl md:text-6xl leading-tight text-stone-900 mb-5">Italian elegance,<br />designed for modern women.</h2><p className="text-stone-600 mb-8">Join our world of refined fashion, curated collections and timeless pieces.</p><NewsletterForm className="mx-auto flex max-w-md border-b border-stone-700" inputClassName="min-w-0 flex-1 bg-transparent px-0 py-3 text-sm focus:outline-none" buttonClassName="px-2 py-3 text-xs uppercase tracking-[0.16em] text-teal" placeholder="Your email address" /></div></section>
     </main>
     <Footer />
-  </div>
-);
+  </div>;
+};
 
 export default NewIn;

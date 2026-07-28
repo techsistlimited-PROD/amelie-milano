@@ -72,8 +72,12 @@ const orderHeaders = async (userId = "guest") => {
 
 export const syncOrder = async (order: OrderRecord, userId = "guest") => {
   const response = await fetch("/api/orders", { method: "POST", headers: await orderHeaders(userId), body: JSON.stringify(order) });
-  if (!response.ok) throw new Error("Unable to sync order with the order service.");
-  return order;
+  const payload = await response.json() as Partial<OrderRecord> & { payment_state?: OrderRecord["paymentState"] };
+  if (!response.ok) throw new Error((payload as { message?: string }).message || "Unable to sync order with the order service.");
+  const synced = { ...order, ...payload, paymentState: payload.payment_state || payload.paymentState };
+  window.localStorage.setItem(ORDERS_KEY, JSON.stringify([synced, ...readOrders().filter((item) => item.number !== order.number)]));
+  window.localStorage.setItem(LAST_ORDER_KEY, JSON.stringify(synced));
+  return synced;
 };
 
 export const claimGuestOrders = async (userId: string) => {

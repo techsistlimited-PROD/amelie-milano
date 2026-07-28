@@ -1,5 +1,5 @@
 import type { RequestHandler } from "express";
-import { insertSupabaseRow } from "../lib/supabase";
+import { supabaseRequest } from "../lib/supabase";
 import { updateOrderStatus, type OrderStatus } from "./orders";
 
 export const PAYMENT_STATES = ["pending", "initiated", "successful", "failed", "cancelled"] as const;
@@ -39,18 +39,24 @@ const savePayment = async (payment: PaymentRecord) => {
   payments.set(payment.transactionId, payment);
   if (process.env.SUPABASE_URL && (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY)) {
     try {
-      await insertSupabaseRow("payment_records", {
-        transaction_id: payment.transactionId,
-        order_number: payment.orderNumber,
-        method: payment.method,
-        state: payment.state,
-        amount: payment.amount,
-        currency: payment.currency,
-        provider: payment.provider,
-        provider_transaction_id: payment.providerTransactionId || null,
-        failure_reason: payment.failureReason || null,
-        created_at: payment.createdAt,
-        updated_at: payment.updatedAt,
+      const orders = await supabaseRequest<any[]>(`commerce_orders?order_number=eq.${encodeURIComponent(payment.orderNumber)}&select=id`);
+      await supabaseRequest("payment_records", {
+        method: "POST",
+        headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+        body: JSON.stringify({
+          transaction_id: payment.transactionId,
+          order_id: orders[0]?.id || null,
+          order_number: payment.orderNumber,
+          method: payment.method,
+          state: payment.state,
+          amount: payment.amount,
+          currency: payment.currency,
+          provider: payment.provider,
+          provider_transaction_id: payment.providerTransactionId || null,
+          failure_reason: payment.failureReason || null,
+          created_at: payment.createdAt,
+          updated_at: payment.updatedAt,
+        }),
       });
     } catch (error) {
       if (process.env.NODE_ENV === "production" || !(error instanceof Error) || !error.message.includes("status 404")) throw error;
@@ -58,8 +64,19 @@ const savePayment = async (payment: PaymentRecord) => {
   }
 };
 
+const paymentFor = async (transactionId: string) => {
+  const cached = payments.get(transactionId);
+  if (cached || !process.env.SUPABASE_URL) return cached;
+  const rows = await supabaseRequest<any[]>(`payment_records?transaction_id=eq.${encodeURIComponent(transactionId)}&select=*`);
+  const row = rows[0];
+  if (!row) return undefined;
+  const payment: PaymentRecord = { transactionId: row.transaction_id, orderNumber: row.order_number, method: row.method, state: row.state, amount: Number(row.amount), currency: row.currency, provider: row.provider, providerTransactionId: row.provider_transaction_id || undefined, failureReason: row.failure_reason || undefined, createdAt: row.created_at, updatedAt: row.updated_at };
+  payments.set(transactionId, payment);
+  return payment;
+};
+
 const updatePayment = async (transactionId: string, patch: Partial<PaymentRecord>) => {
-  const existing = payments.get(transactionId);
+  const existing = await paymentFor(transactionId);
   if (!existing) throw new Error("Payment transaction not found.");
   const updated = { ...existing, ...patch, updatedAt: new Date().toISOString() };
   await savePayment(updated);
@@ -70,7 +87,7 @@ const updatePayment = async (transactionId: string, patch: Partial<PaymentRecord
     failed: "Cancelled",
     cancelled: "Cancelled",
   };
-  updateOrderStatus(updated.orderNumber, statusByPayment[updated.state]!, updated.state, updated.transactionId);
+  await updateOrderStatus(updated.orderNumber, statusByPayment[updated.state]!, updated.state, updated.transactionId);
   return updated;
 };
 
@@ -133,7 +150,7 @@ const verifySslCommerz = async (payload: Record<string, string>) => {
 const completeVerifiedPayment: RequestHandler = async (req, res) => {
   const payload = Object.fromEntries(Object.entries(req.body || {}).map(([key, value]) => [key, String(value)]));
   const transactionId = payload.tran_id || payload.value_a;
-  const payment = transactionId ? payments.get(transactionId) : undefined;
+  const payment = transactionId ? await paymentFor(transactionId) : undefined;
   if (!payment) {
     res.redirect(redirectFor(payload.value_a || "", "failed", "Payment transaction not found."));
     return;
@@ -177,13 +194,13 @@ export const initiatePayment: RequestHandler = async (req, res) => {
 export const handlePaymentSuccess: RequestHandler = (req, res, next) => { void completeVerifiedPayment(req, res, next); };
 export const handlePaymentFailure: RequestHandler = async (req, res) => {
   const payload = Object.fromEntries(Object.entries(req.body || {}).map(([key, value]) => [key, String(value)]));
-  const payment = payload.tran_id ? payments.get(payload.tran_id) : undefined;
+  const payment = payload.tran_id ? await paymentFor(payload.tran_id) : undefined;
   if (payment) await updatePayment(payment.transactionId, { state: "failed", failureReason: "The payment provider declined the transaction." });
   res.redirect(redirectFor(payment?.orderNumber || "", "failed", "The payment provider declined the transaction."));
 };
 export const handlePaymentCancel: RequestHandler = async (req, res) => {
   const payload = Object.fromEntries(Object.entries(req.body || {}).map(([key, value]) => [key, String(value)]));
-  const payment = payload.tran_id ? payments.get(payload.tran_id) : undefined;
+  const payment = payload.tran_id ? await paymentFor(payload.tran_id) : undefined;
   if (payment) await updatePayment(payment.transactionId, { state: "cancelled", failureReason: "Payment was cancelled by the customer." });
   res.redirect(redirectFor(payment?.orderNumber || "", "cancelled", "Payment was cancelled by the customer."));
 };

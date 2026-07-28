@@ -9,6 +9,17 @@ export const getSupabaseUserId = async (authorization?: string) => {
   return user.id || null;
 };
 
+export const supabaseRequest = async <T = unknown>(path: string, options: RequestInit = {}) => {
+  if (!supabaseUrl || !supabaseKey) throw new Error("Supabase is not configured.");
+  const response = await fetch(`${supabaseUrl}/rest/v1/${path}`, {
+    ...options,
+    headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}`, "Content-Type": "application/json", ...(options.headers || {}) },
+  });
+  if (!response.ok) throw new Error(`Supabase request failed with status ${response.status}.`);
+  const text = await response.text();
+  return (text ? JSON.parse(text) : null) as T;
+};
+
 export const insertSupabaseRow = async (table: string, payload: Record<string, unknown>) => {
   if (!supabaseUrl || !supabaseKey) {
     throw new Error("Supabase is not configured.");
