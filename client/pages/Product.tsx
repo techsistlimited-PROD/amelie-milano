@@ -91,6 +91,21 @@ const ProductPage = () => {
     setAddedToCart(false);
   }, [id, isBodyCare, isBag, product.colour]);
 
+  useEffect(() => {
+    const description = product.tagline || `Shop ${product.name} from Amelie Milano.`;
+    const canonicalUrl = `${window.location.origin}/product/${id}`;
+    document.title = `${product.name} | Amelie Milano`;
+    const setMeta = (selector: string, attributes: Record<string, string>) => { let element = document.head.querySelector<HTMLMetaElement>(selector); if (!element) { element = document.createElement("meta"); document.head.appendChild(element); } Object.entries(attributes).forEach(([key, value]) => element!.setAttribute(key, value)); };
+    setMeta('meta[name="description"]', { name: "description", content: description });
+    setMeta('meta[property="og:title"]', { property: "og:title", content: `${product.name} | Amelie Milano` });
+    setMeta('meta[property="og:description"]', { property: "og:description", content: description });
+    setMeta('meta[property="og:image"]', { property: "og:image", content: product.image });
+    setMeta('meta[property="og:type"]', { property: "og:type", content: "product" });
+    let canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]'); if (!canonical) { canonical = document.createElement("link"); canonical.rel = "canonical"; document.head.appendChild(canonical); } canonical.href = canonicalUrl;
+    let script = document.head.querySelector<HTMLScriptElement>('script[data-amelie-product-schema="true"]'); if (!script) { script = document.createElement("script"); script.type = "application/ld+json"; script.dataset.amelieProductSchema = "true"; document.head.appendChild(script); }
+    script.textContent = JSON.stringify({ "@context": "https://schema.org", "@type": "Product", name: product.name, description, image: [product.image], sku: id, category: product.category, brand: { "@type": "Brand", name: "Amelie Milano" }, offers: { "@type": "Offer", url: canonicalUrl, priceCurrency: "BDT", price: product.price, availability: "https://schema.org/InStock", itemCondition: "https://schema.org/NewCondition" } });
+  }, [id, product.category, product.image, product.name, product.price, product.tagline]);
+
   const handleAddToCart = () => {
     addToCart({
       id,
