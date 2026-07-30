@@ -111,22 +111,70 @@ curl -fsS http://127.0.0.1:3010/health
 **Builder.io → Project settings**
 
 - Production URL / preview: `https://ameliemilano.com`
+- Public API key → set as `VITE_PUBLIC_BUILDER_KEY` in VPS `.env` before Docker build
 
 **SSLCommerz merchant panel**
 
 - Success / fail / cancel / IPN URLs must use `https://ameliemilano.com/api/payments/sslcommerz/...`
 
-## GitHub Actions secrets
+## GitHub Actions secrets (CI/CD — same pattern as NUB ERP)
 
-| Secret | Description |
-|--------|-------------|
+Repo: **Settings → Secrets and variables → Actions → New repository secret**
+
+| Secret | Value |
+|--------|-------|
 | `SERVER_HOST` | `82.25.110.116` |
-| `SERVER_USER` | SSH user (e.g. `root` or deploy user) |
-| `SSH_PRIVATE_KEY` | Private key for VPS access |
+| `SERVER_USER` | `root` |
+| `SSH_PRIVATE_KEY` | Full VPS private key (PEM contents) |
+| `GIT_DEPLOY_TOKEN` | GitHub PAT with **repo read** access (for `git pull` on private repo) |
 
-Optional (if CI builds with real keys instead of server-side build):
+After secrets are set, every push to `main` runs tests then deploys automatically.
 
-- `VITE_PUBLIC_BUILDER_KEY`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
+Manual deploy on VPS:
+
+```bash
+bash deploy/scripts/deploy.sh
+```
+
+## Builder.io CMS (must configure for production)
+
+The CMS loads content at **runtime** from Builder CDN in the browser. No rebuild is needed when you publish in Builder — but the **API key must be baked into the Docker image** at build time.
+
+### 1. `.env` on VPS (before `docker compose build`)
+
+```bash
+VITE_PUBLIC_BUILDER_KEY=your_real_builder_public_key   # NOT __BUILDER_PUBLIC_KEY__
+```
+
+Get the key: Builder.io → your space → **Account / Space settings → Public API Key**.
+
+### 2. Builder.io project settings
+
+In Builder.io for this project:
+
+| Setting | Value |
+|---------|-------|
+| Site URL / Production URL | `https://ameliemilano.com` |
+| Preview URL | `https://ameliemilano.com` |
+
+Models used by the app: `page`, `amelie-product`, `amelie-collection`, `amelie-editorial`, `amelie-site-section`.
+
+### 3. Verify CMS after deploy
+
+```bash
+# Builder key must NOT be placeholder in the built JS
+curl -s http://127.0.0.1:3010/ | grep -o 'builder' | head -1
+
+# Site should load; open homepage and a /product/* page in browser
+curl -I https://ameliemilano.com
+```
+
+If CMS content is missing, rebuild after fixing `.env`:
+
+```bash
+docker compose -f docker-compose.prod.yml build --no-cache
+docker compose -f docker-compose.prod.yml up -d
+```
 
 ## Health checks
 
