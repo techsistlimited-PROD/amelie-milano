@@ -26,9 +26,34 @@ sudo chown $USER:$USER /opt/amelie-milano
 cd /opt/amelie-milano
 
 # After GitHub repo exists:
-git clone https://github.com/techsistltd/amelie_milano_cms.git .
+git clone https://github.com/techsistlimited-PROD/amelie-milano.git .
 cp .env.example .env
-nano .env   # fill all values (see checklist below)
+# Edit .env — see "Create .env without nano" below
+```
+
+**Create `.env` without nano** (paste your real keys, then press Enter, then `Ctrl+D`):
+
+```bash
+cat > .env << 'EOF'
+VITE_PUBLIC_BUILDER_KEY=paste_your_builder_key_here
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=paste_your_anon_key_here
+PORT=3000
+PUBLIC_SITE_URL=https://ameliemilano.com
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=paste_your_service_role_key_here
+SSLCOMMERZ_STORE_ID=
+SSLCOMMERZ_STORE_PASSWORD=
+SSLCOMMERZ_IS_LIVE=false
+HOST_PORT=3010
+EOF
+```
+
+Or copy `.env` from your Windows PC (if you already have one locally):
+
+```powershell
+# Run on Windows PowerShell (not on the VPS)
+scp "D:\Amelie Milano with CMS\.env" root@82.25.110.116:/opt/amelie-milano/.env
 ```
 
 ### Caddy
