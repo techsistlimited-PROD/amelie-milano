@@ -1,0 +1,15 @@
+# Amelie Milano — Caddy site block
+# Merge into /etc/caddy/Caddyfile on srv852479 (same VPS as NUB ERP).
+#
+# Prerequisite: Docker app listening on 127.0.0.1:3010
+#   cd /opt/amelie-milano && docker compose -f docker-compose.prod.yml up -d
+
+ameliemilano.com, www.ameliemilano.com {
+	encode gzip
+	reverse_proxy 127.0.0.1:3010
+
+	log {
+		output file /var/log/caddy/ameliemilano_access.log
+		format json
+	}
+}

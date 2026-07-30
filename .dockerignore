@@ -1,0 +1,14 @@
+node_modules
+dist
+.git
+.github
+*.md
+!deploy/**/*.md
+.env
+.env.*
+!.env.example
+*.log
+.vscode
+.idea
+.DS_Store
+netlify
