@@ -4,7 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import { fetchBuilderEditorial, isBuilderConfigured, type BuilderEditorialData } from "@/lib/builder";
+import { fetchBuilderEditorial, type BuilderEditorialData } from "@/lib/builder";
 
 const articles = {
   "italian-tailoring": { tag: "Fashion", title: "The Art of Italian Tailoring", dek: "Explore the quiet craft behind a considered silhouette.", image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F92b67c169b484849bc0557782bc3580b?format=webp&width=1400&quality=95", intro: "Italian tailoring is an exercise in restraint. It is the balance between structure and movement, between a precise shoulder and the ease of a fabric that follows the body.", sections: [["The beauty of intention", "A considered garment begins long before it reaches the wardrobe. Proportion, texture and line are brought together with patience, so the final silhouette feels effortless rather than overworked."], ["Made for movement", "The most memorable pieces do not ask a woman to become someone else. They make room for her own rhythm, carrying the quiet confidence of thoughtful construction from morning light to evening."], ["The Amelie point of view", "At Amelie Milano, Italian inspiration becomes a modern Bangladesh wardrobe: refined, expressive and designed to be returned to season after season."]] },
@@ -23,9 +23,8 @@ const JournalArticle = () => {
 
   useEffect(() => {
     setCmsArticle(null);
-    if (!slug || !isBuilderConfigured) return;
-    fetchBuilderEditorial(slug).then((result) => {
-      const data = result?.data as BuilderEditorialData | undefined;
+    if (!slug) return;
+    void fetchBuilderEditorial(slug).then((data) => {
       if (data) setCmsArticle(data);
     });
   }, [slug]);

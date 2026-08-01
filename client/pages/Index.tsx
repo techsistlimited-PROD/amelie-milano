@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { fetchBuilderProducts, fetchBuilderSiteSections, isBuilderConfigured, type BuilderSiteSectionData } from "@/lib/builder";
+import { fetchBuilderProducts, fetchBuilderSiteSections, type BuilderSiteSectionData } from "@/lib/builder";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
@@ -105,15 +105,22 @@ const Index = () => {
   const [cmsProducts, setCmsProducts] = useState<Array<{ id: string; name: string; price: number; image: string; isNew?: boolean }>>([]);
 
   useEffect(() => {
-    if (!isBuilderConfigured) return;
-    fetchBuilderSiteSections().then((entries) => setCmsSections(entries.map((entry) => entry.data)));
-    fetchBuilderProducts().then((entries) => setCmsProducts(entries.map(({ id, data }) => ({
-      id,
-      name: data.title,
-      price: data.priceBdt,
-      image: data.heroImage,
-      isNew: data.isNew ?? false,
-    }))));
+    void (async () => {
+      const [sections, products] = await Promise.all([
+        fetchBuilderSiteSections(),
+        fetchBuilderProducts(),
+      ]);
+      if (sections.length) setCmsSections(sections);
+      if (products.length) {
+        setCmsProducts(products.map((data) => ({
+          id: data.slug,
+          name: data.title,
+          price: data.priceBdt,
+          image: data.heroImage,
+          isNew: data.isNew ?? false,
+        })));
+      }
+    })();
   }, []);
 
   const sections = useMemo(() => new Map(cmsSections.map((section) => [section.key, section])), [cmsSections]);

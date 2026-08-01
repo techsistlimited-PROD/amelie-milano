@@ -21,18 +21,32 @@ const descriptions: Record<string, string> = {
 
 const SiteMeta = () => {
   const { pathname } = useLocation();
-  const [builderMeta, setBuilderMeta] = useState<{ title?: string; description?: string; seoTitle?: string; seoDescription?: string } | null>(null);
+  const [cmsMeta, setCmsMeta] = useState<{ seoTitle?: string; seoDescription?: string; title?: string } | null>(null);
+
   useEffect(() => {
     let active = true;
-    setBuilderMeta(null);
-    if (pathname.startsWith("/cms/") && isBuilderConfigured) fetchBuilderPage(pathname).then((entry) => { if (active) setBuilderMeta(entry?.data as typeof builderMeta || null); });
-    return () => { active = false; };
+    setCmsMeta(null);
+    if (isBuilderConfigured()) {
+      fetchBuilderPage(pathname).then((page) => {
+        if (active && page) setCmsMeta(page as typeof cmsMeta);
+      });
+    }
+    return () => {
+      active = false;
+    };
   }, [pathname]);
+
   const section = pathname.split("/").filter(Boolean).pop();
   const label = section ? section.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()) : "Home";
   const fallbackTitle = pathname === "/" ? "Amelie Milano | Italian-Inspired Fashion & Lifestyle" : `${label} | Amelie Milano`;
   const fallbackDescription = descriptions[pathname] || `Discover ${label.toLowerCase()} from Amelie Milano, an Italian-inspired fashion and lifestyle house.`;
-  return <Seo title={builderMeta?.seoTitle || builderMeta?.title || fallbackTitle} description={builderMeta?.seoDescription || builderMeta?.description || fallbackDescription} />;
+
+  return (
+    <Seo
+      title={cmsMeta?.seoTitle || cmsMeta?.title || fallbackTitle}
+      description={cmsMeta?.seoDescription || fallbackDescription}
+    />
+  );
 };
 
 export default SiteMeta;

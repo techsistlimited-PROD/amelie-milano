@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Amelie Milano">
+  <rect width="64" height="64" rx="12" fill="#1F6B6B"/>
+  <path
+    fill="#F5EFE6"
+    d="M32 12 14 52h8.2l3.4-8.8h21.8l3.4 8.8H59L41 12h-9zm-1.2 24.4L32 28.6l1.2 7.8H30.8z"
+  />
+  <circle cx="48" cy="16" r="4" fill="#C69B6D"/>
+</svg>

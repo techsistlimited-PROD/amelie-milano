@@ -1,61 +1,12 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ChevronRight, Filter, Heart, MessageCircle, X } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useWishlist } from "@/lib/wishlist";
 import PlaceholderPage from "./PlaceholderPage";
-
-const dressProducts = [
-  {
-    id: "1",
-    name: "Espresso Drape Kaftan Dress",
-    price: 8375,
-    image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Fca01513621cd4cd19c92e5bb2129ea91?format=webp&width=800&height=1200",
-    badge: "New",
-    colour: "Espresso",
-  },
-  {
-    id: "2",
-    name: "Champagne Pleated Corset Dress",
-    price: 11500,
-    image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F9e4e485b99eb4fd9b45892f8bf08f453?format=webp&width=800&height=1200",
-    badge: "New",
-    colour: "Champagne",
-  },
-  {
-    id: "3",
-    name: "Ivory Off-Shoulder Sash Gown",
-    price: 9200,
-    image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F7d742ca7c32545b4bf89e1999827cb6f?format=webp&width=800&height=1200",
-    badge: "New",
-    colour: "Ivory",
-  },
-  {
-    id: "4",
-    name: "Noir One-Shoulder Cutout Dress",
-    price: 10500,
-    image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Fac1870ce26284d1e9c304a0b6fa78fde?format=webp&width=800&height=1200",
-    badge: "Low Stock",
-    colour: "Noir",
-  },
-  {
-    id: "5",
-    name: "Plum One-Shoulder Column Dress",
-    price: 9800,
-    image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Fd82ccb0930fd4d0e8a2edb49f49368e1?format=webp&width=800&height=1200",
-    colour: "Plum",
-  },
-  {
-    id: "6",
-    name: "Burgundy Sequin Cape Gown",
-    price: 12500,
-    salePrice: 10625,
-    image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Ff2edad5f9989469e9179290f0356a25b?format=webp&width=800&height=1200",
-    badge: "Sale",
-    colour: "Burgundy",
-  },
-];
+import { fetchBuilderCollection, fetchBuilderProducts } from "@/lib/builder";
+import { CatalogProduct, cmsToCatalog, filterCatalogProducts, sortCatalogProducts } from "@/lib/catalogProduct";
 
 const subcategories = [
   "All Dresses",
@@ -78,7 +29,7 @@ const filterGroups = [
   { label: "Availability", options: ["In Stock", "Low Stock"] },
 ];
 
-const DressProductCard = ({ product }: { product: (typeof dressProducts)[number] }) => {
+const DressProductCard = ({ product }: { product: CatalogProduct }) => {
   const { saved: wishlisted, toggle } = useWishlist({ id: product.id, name: product.name, price: product.salePrice ?? product.price, image: product.image, category: "Dresses", colour: product.colour, option: "M" });
 
   return (
@@ -134,12 +85,28 @@ const Category = () => {
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
   const [sort, setSort] = useState("Featured");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [dressProducts, setDressProducts] = useState<CatalogProduct[]>([]);
+
+  useEffect(() => {
+    if (category !== "dresses") return;
+    void (async () => {
+      const [collection, allProducts] = await Promise.all([
+        fetchBuilderCollection("dresses"),
+        fetchBuilderProducts(),
+      ]);
+      const catalog = allProducts.map(cmsToCatalog);
+      const slugs = collection?.products?.length ? collection.products : null;
+      const listed = slugs?.length
+        ? slugs.map((slug) => catalog.find((item) => item.id === slug)).filter((item): item is CatalogProduct => Boolean(item))
+        : catalog.filter((item) => item.category === "Dresses" || item.category === "Occasionwear");
+      if (listed.length) setDressProducts(listed);
+    })();
+  }, [category]);
 
   const visibleProducts = useMemo(() => {
-    if (sort === "Price: Low to High") return [...dressProducts].sort((a, b) => (a.salePrice ?? a.price) - (b.salePrice ?? b.price));
-    if (sort === "Price: High to Low") return [...dressProducts].sort((a, b) => (b.salePrice ?? b.price) - (a.salePrice ?? a.price));
-    return dressProducts;
-  }, [sort]);
+    const filtered = filterCatalogProducts(dressProducts, selectedFilters);
+    return sortCatalogProducts(filtered, sort);
+  }, [dressProducts, selectedFilters, sort]);
 
   const toggleFilter = (option: string) => {
     setSelectedFilters((current) => current.includes(option) ? current.filter((item) => item !== option) : [...current, option]);
@@ -273,7 +240,7 @@ const Category = () => {
           <div className="container mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
               <div className="max-w-lg"><p className="text-teal text-[10px] uppercase tracking-[0.2em] mb-4">The Amelie Dress Edit</p><h2 className="font-serif text-4xl md:text-5xl text-stone-900 mb-5">Ease, elegance and confidence.</h2><p className="text-stone-600 leading-relaxed mb-7">From soft daytime silhouettes to after-dark statement pieces, each dress is selected to bring ease, elegance and confidence into your wardrobe.</p><Link to="/the-amelie-edit" className="btn-outline inline-flex items-center gap-2">Explore the Edit <ChevronRight size={16} /></Link></div>
-              <div className="grid grid-cols-2 gap-4"><img src={dressProducts[4].image} alt="Plum evening dress" className="w-full aspect-[3/4] object-cover" /><img src={dressProducts[5].image} alt="Burgundy occasion gown" className="w-full aspect-[3/4] object-cover mt-10" /></div>
+              <div className="grid grid-cols-2 gap-4"><img src={visibleProducts[4]?.image ?? dressProducts[4]?.image} alt="Plum evening dress" className="w-full aspect-[3/4] object-cover" /><img src={visibleProducts[5]?.image ?? dressProducts[5]?.image} alt="Burgundy occasion gown" className="w-full aspect-[3/4] object-cover mt-10" /></div>
             </div>
           </div>
         </section>
@@ -282,7 +249,7 @@ const Category = () => {
           <div className="container mx-auto px-4 text-center max-w-2xl"><MessageCircle className="mx-auto text-teal mb-4" size={28} /><h2 className="font-serif text-3xl md:text-4xl text-stone-900 mb-4">Need help choosing the perfect dress?</h2><p className="text-stone-600 leading-relaxed mb-7">Our Style Concierge can help you find the right silhouette, size and styling direction for your occasion.</p><a href="https://wa.me/8801777993895?text=Hello%20Amelie%20Milano%2C%20I%20would%20love%20help%20choosing%20a%20dress." target="_blank" rel="noopener noreferrer" className="btn-primary inline-flex">Chat on WhatsApp</a></div>
         </section>
 
-        <section className="bg-white py-14 md:py-20"><div className="container mx-auto px-4"><div className="flex items-end justify-between mb-8"><div><p className="text-teal text-[10px] uppercase tracking-[0.2em] mb-3">Complete the look</p><h2 className="font-serif text-4xl text-stone-900">You May Also Like</h2></div><Link to="/shop" className="hidden sm:flex items-center gap-2 text-xs uppercase tracking-wider text-teal">Shop all <ChevronRight size={15} /></Link></div><div className="grid grid-cols-2 md:grid-cols-4 gap-4">{dressProducts.slice(2, 6).map((product) => <DressProductCard key={`related-${product.id}`} product={product} />)}</div></div></section>
+        <section className="bg-white py-14 md:py-20"><div className="container mx-auto px-4"><div className="flex items-end justify-between mb-8"><div><p className="text-teal text-[10px] uppercase tracking-[0.2em] mb-3">Complete the look</p><h2 className="font-serif text-4xl text-stone-900">You May Also Like</h2></div><Link to="/shop" className="hidden sm:flex items-center gap-2 text-xs uppercase tracking-wider text-teal">Shop all <ChevronRight size={15} /></Link></div><div className="grid grid-cols-2 md:grid-cols-4 gap-4">{visibleProducts.slice(2, 6).map((product) => <DressProductCard key={`related-${product.id}`} product={product} />)}</div></div></section>
 
         <section className="bg-ivory py-14 md:py-20"><div className="container mx-auto px-4 max-w-3xl text-center"><h2 className="font-serif text-3xl text-stone-900 mb-4">Dresses by Amelie Milano</h2><p className="text-sm text-stone-600 leading-relaxed">Shop premium dresses in Bangladesh, from refined day dresses and sculpted midi silhouettes to occasion gowns made for unforgettable evenings. Discover considered details, graceful draping and versatile pieces designed to become part of your signature wardrobe.</p></div></section>
       </main>

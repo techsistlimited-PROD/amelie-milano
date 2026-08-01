@@ -40,10 +40,19 @@ import Shipping from "./pages/Shipping";
 import Returns from "./pages/Returns";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
-import BuilderPage from "./pages/BuilderPage";
 import BuilderRouteContent from "./components/BuilderRouteContent";
 import AuthBootstrap from "./components/AuthBootstrap";
 import AuthCallback from "./pages/AuthCallback";
+import AdminApp from "./pages/admin/AdminApp";
+import { useEffect } from "react";
+import { checkCmsStatus } from "./lib/cms";
+
+const CmsBootstrap = () => {
+  useEffect(() => {
+    void checkCmsStatus();
+  }, []);
+  return null;
+};
 
 const queryClient = new QueryClient();
 
@@ -54,8 +63,10 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthBootstrap />
+        <CmsBootstrap />
         <SiteMeta />
         <Routes>
+          <Route path="/admin/*" element={<AdminApp />} />
           <Route path="/" element={<BuilderRouteContent><Index /></BuilderRouteContent>} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/shop/new" element={<NewIn />} />
@@ -87,7 +98,6 @@ const App = () => (
           <Route path="/privacy" element={<BuilderRouteContent><Privacy /></BuilderRouteContent>} />
           <Route path="/terms" element={<BuilderRouteContent><Terms /></BuilderRouteContent>} />
           <Route path="/the-amelie-edit" element={<BuilderRouteContent><TheAmelieEdit /></BuilderRouteContent>} />
-          <Route path="/cms/*" element={<BuilderPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

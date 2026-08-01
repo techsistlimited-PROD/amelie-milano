@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { addToCart } from "@/lib/cart";
 import { useWishlist } from "@/lib/wishlist";
-import { fetchBuilderProduct, isBuilderConfigured, type BuilderProductData } from "@/lib/builder";
+import { fetchBuilderProduct, type BuilderProductData, fetchBuilderProducts } from "@/lib/builder";
 
 const productCatalog = {
   "1": { name: "Espresso Drape Kaftan Dress", price: 8375, category: "Dresses", tagline: "A fluid silhouette with effortless evening movement.", material: "Silk-touch satin", colour: "Espresso", image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Fca01513621cd4cd19c92e5bb2129ea91?format=webp&width=1000&height=1400" },
@@ -50,14 +50,29 @@ const ProductPage = () => {
   const { id = "1" } = useParams();
   const fallbackProduct: Product = productCatalog[id as keyof typeof productCatalog] ?? productCatalog["1"];
   const [cmsProduct, setCmsProduct] = useState<BuilderProductData | null>(null);
+  const [relatedItems, setRelatedItems] = useState(relatedProducts);
 
   useEffect(() => {
     setCmsProduct(null);
-    if (!isBuilderConfigured) return;
-    fetchBuilderProduct(id).then((result) => {
-      const data = result?.data as BuilderProductData | undefined;
+    void (async () => {
+      const [data, allProducts] = await Promise.all([
+        fetchBuilderProduct(id),
+        fetchBuilderProducts(),
+      ]);
       if (data) setCmsProduct(data);
-    });
+      if (allProducts.length) {
+        const related = allProducts
+          .filter((item) => item.slug !== id)
+          .slice(0, 3)
+          .map((item) => ({
+            name: item.title,
+            price: item.priceBdt,
+            image: item.heroImage,
+            href: `/product/${item.slug}`,
+          }));
+        if (related.length) setRelatedItems(related);
+      }
+    })();
   }, [id]);
 
   const product: Product = cmsProduct
@@ -66,8 +81,8 @@ const ProductPage = () => {
         price: cmsProduct.priceBdt,
         category: cmsProduct.category,
         tagline: cmsProduct.description ?? "",
-        material: "Amelie Milano signature finish",
-        colour: cmsProduct.variants?.[0]?.color ?? "Signature",
+        material: cmsProduct.material ?? "Amelie Milano signature finish",
+        colour: cmsProduct.colour ?? cmsProduct.variants?.[0]?.color ?? "Signature",
         image: cmsProduct.heroImage,
       }
     : fallbackProduct;
@@ -125,7 +140,7 @@ const ProductPage = () => {
 
     <section className="bg-[#F0E9E2] py-16 md:py-24"><div className="container mx-auto px-4 max-w-4xl"><div className="grid md:grid-cols-2 gap-10 md:gap-20"><div><p className="text-teal text-[10px] uppercase tracking-[0.24em] mb-4">The story</p><h2 className="font-serif text-4xl md:text-5xl mb-5">Designed to become a signature.</h2><p className="text-stone-600 leading-relaxed">{product.tagline} Every detail is considered for the modern Amelie woman — from the first impression to the way the piece moves with you.</p></div><div className="space-y-5 text-sm text-stone-600 leading-relaxed"><p><strong className="text-stone-900">Material:</strong> {product.material}</p><p><strong className="text-stone-900">Care:</strong> Dry clean or hand wash gently in cold water. Store away from direct sunlight.</p><p><strong className="text-stone-900">Origin:</strong> Designed with an Italian-inspired point of view for the modern Bangladesh wardrobe.</p><blockquote className="font-serif italic text-2xl text-teal border-l-2 border-gold pl-5 pt-2">“The most beautiful pieces leave room for you to become yourself.”</blockquote></div></div></div></section>
 
-    <section className="bg-white py-16 md:py-24"><div className="container mx-auto px-4"><div className="flex items-end justify-between mb-9"><div><p className="text-teal text-[10px] uppercase tracking-[0.24em] mb-3">Complete the look</p><h2 className="font-serif text-4xl">Style &amp; Pairing</h2></div><Link to="/shop" className="text-xs uppercase tracking-[0.16em] text-teal">Shop More</Link></div><div className="grid grid-cols-3 gap-4 md:gap-6">{relatedProducts.map((item) => <Link key={item.name} to={item.href} className="group"><div className="overflow-hidden mb-4"><img src={item.image} alt={item.name} className="w-full aspect-[3/4] object-cover group-hover:scale-[1.03] transition-transform duration-500" /></div><h3 className="font-serif text-lg group-hover:text-teal transition-colors">{item.name}</h3><p className="text-sm text-stone-600 mt-2">BDT {item.price.toLocaleString()}</p><span className="mt-3 inline-flex text-xs uppercase tracking-[0.14em] text-teal">Shop Now <ChevronRight size={14} /></span></Link>)}</div></div></section>
+    <section className="bg-white py-16 md:py-24"><div className="container mx-auto px-4"><div className="flex items-end justify-between mb-9"><div><p className="text-teal text-[10px] uppercase tracking-[0.24em] mb-3">Complete the look</p><h2 className="font-serif text-4xl">Style &amp; Pairing</h2></div><Link to="/shop" className="text-xs uppercase tracking-[0.16em] text-teal">Shop More</Link></div><div className="grid grid-cols-3 gap-4 md:gap-6">{relatedItems.map((item) => <Link key={item.name} to={item.href} className="group"><div className="overflow-hidden mb-4"><img src={item.image} alt={item.name} className="w-full aspect-[3/4] object-cover group-hover:scale-[1.03] transition-transform duration-500" /></div><h3 className="font-serif text-lg group-hover:text-teal transition-colors">{item.name}</h3><p className="text-sm text-stone-600 mt-2">BDT {item.price.toLocaleString()}</p><span className="mt-3 inline-flex text-xs uppercase tracking-[0.14em] text-teal">Shop Now <ChevronRight size={14} /></span></Link>)}</div></div></section>
 
     <section className="bg-[#F0E9E2] py-16 md:py-24"><div className="container mx-auto px-4 max-w-4xl"><div className="text-center mb-10"><p className="text-teal text-[10px] uppercase tracking-[0.24em] mb-3">The Amelie Fit</p><h2 className="font-serif text-4xl">Size Guide &amp; Fit</h2><p className="text-sm text-stone-600 mt-3">Need help? Our Style Concierge can help you find your perfect fit.</p></div><div className="grid md:grid-cols-2 gap-4"><details className="bg-white p-5 group"><summary className="flex justify-between cursor-pointer text-xs uppercase tracking-[0.16em]">How it fits <ChevronDown size={16} className="group-open:rotate-180 transition-transform" /></summary><p className="text-sm text-stone-600 leading-relaxed mt-4">Our pieces are designed for a graceful, true-to-size fit. For a more fluid silhouette, choose one size up.</p></details><details className="bg-white p-5 group"><summary className="flex justify-between cursor-pointer text-xs uppercase tracking-[0.16em]">Size conversion <ChevronDown size={16} className="group-open:rotate-180 transition-transform" /></summary><p className="text-sm text-stone-600 leading-relaxed mt-4">XS 6–8 · S 8–10 · M 10–12 · L 12–14 · XL 14–16. Measurements may vary by silhouette.</p></details></div></div></section>
 

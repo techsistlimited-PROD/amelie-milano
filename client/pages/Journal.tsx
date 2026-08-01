@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import NewsletterForm from "@/components/NewsletterForm";
-import { fetchBuilderEditorials, isBuilderConfigured, type BuilderEditorialData } from "@/lib/builder";
+import { fetchBuilderEditorials, type BuilderEditorialData } from "@/lib/builder";
 
 const fallbackArticles = [
   { category: "Fashion", title: "The Art of Italian Tailoring", excerpt: "Explore the quiet craft behind a considered silhouette.", heroImage: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F92b67c169b484849bc0557782bc3580b?format=webp&width=1000&quality=95", slug: "italian-tailoring", author: "Amelie Milano", publishedAt: "2025-01-15" },
@@ -31,8 +31,9 @@ const Journal = () => {
   const [cmsArticles, setCmsArticles] = useState<ReturnType<typeof toArticle>[]>([]);
 
   useEffect(() => {
-    if (!isBuilderConfigured) return;
-    fetchBuilderEditorials().then((entries) => setCmsArticles(entries.map(({ data }) => toArticle(data))));
+    void fetchBuilderEditorials().then((entries) => {
+      if (entries.length) setCmsArticles(entries.map((data) => toArticle(data)));
+    });
   }, []);
 
   const articles = cmsArticles.length ? cmsArticles : fallbackArticles;

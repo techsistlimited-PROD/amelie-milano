@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { shopCategories, storeCatalog } from "@/lib/storeCatalog";
-import { fetchBuilderProducts, isBuilderConfigured } from "@/lib/builder";
+import { fetchBuilderProducts } from "@/lib/builder";
 
 const Shop = () => {
   const [searchParams] = useSearchParams();
@@ -17,15 +17,15 @@ const Shop = () => {
   const [cmsProducts, setCmsProducts] = useState<typeof storeCatalog>([]);
   useEffect(() => setQuery(searchParams.get("query") ?? ""), [searchParams]);
   useEffect(() => {
-    if (!isBuilderConfigured) return;
-    fetchBuilderProducts().then((entries) => {
-      setCmsProducts(entries.map(({ id, data }) => ({
-        id,
+    void fetchBuilderProducts().then((entries) => {
+      if (!entries.length) return;
+      setCmsProducts(entries.map((data) => ({
+        id: data.slug,
         name: data.title,
         price: data.priceBdt,
         category: data.category,
-        colour: data.variants?.[0]?.color ?? "Signature",
-        material: "Amelie Milano signature finish",
+        colour: data.colour ?? data.variants?.[0]?.color ?? "Signature",
+        material: data.material ?? "Amelie Milano signature finish",
         image: data.heroImage,
         isNew: data.isNew,
       })));

@@ -6,7 +6,7 @@ import NewsletterForm from "@/components/NewsletterForm";
 import { useWishlist } from "@/lib/wishlist";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { fetchBuilderProducts, isBuilderConfigured } from "@/lib/builder";
+import { fetchBuilderProducts } from "@/lib/builder";
 
 const newInProducts = [
   {
@@ -93,9 +93,8 @@ const NewInProductCard = ({ product }: { product: (typeof newInProducts)[number]
 const NewIn = () => {
   const [products, setProducts] = useState(newInProducts);
   useEffect(() => {
-    if (!isBuilderConfigured) return;
-    fetchBuilderProducts().then((entries) => {
-      const next = entries.filter(({ data }) => data.isNew).map(({ id, data }) => ({ id, name: data.title, price: data.priceBdt, image: data.heroImage }));
+    void fetchBuilderProducts().then((entries) => {
+      const next = entries.filter((data) => data.isNew).map((data) => ({ id: data.slug, name: data.title, price: data.priceBdt, image: data.heroImage }));
       if (next.length) setProducts(next);
     });
   }, []);

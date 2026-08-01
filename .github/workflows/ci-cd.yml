@@ -37,7 +37,6 @@ jobs:
 
       - name: Build (placeholder env for CI)
         env:
-          VITE_PUBLIC_BUILDER_KEY: ci-placeholder
           VITE_SUPABASE_URL: https://example.supabase.co
           VITE_SUPABASE_ANON_KEY: ci-placeholder
         run: pnpm run build

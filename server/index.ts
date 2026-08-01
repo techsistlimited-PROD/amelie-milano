@@ -9,6 +9,8 @@ import { getWishlist, saveWishlist } from "./routes/wishlist";
 import { handleContactSubmission, handleStyleConciergeSubmission } from "./routes/submissions";
 import { getPayment, handlePaymentCancel, handlePaymentFailure, handlePaymentIpn, handlePaymentSuccess, initiatePayment } from "./routes/payments";
 import { handleSitemap } from "./routes/sitemap";
+import { cmsPublicRouter } from "./routes/cms/public";
+import { cmsAdminRouter } from "./routes/cms/admin";
 
 export function createServer() {
   const app = express();
@@ -49,6 +51,9 @@ export function createServer() {
   app.post("/api/payments/sslcommerz/fail", handlePaymentFailure);
   app.post("/api/payments/sslcommerz/cancel", handlePaymentCancel);
   app.post("/api/payments/sslcommerz/ipn", handlePaymentIpn);
+
+  app.use("/api/cms", cmsPublicRouter);
+  app.use("/api/admin/cms", cmsAdminRouter);
 
   return app;
 }
