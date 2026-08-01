@@ -1,12 +1,12 @@
 # Amelie Milano — ameliemilano.com @ Hostinger VPS
 
-Express + React SPA with Builder.io CMS and Supabase.  
+Express + React SPA with **built-in Supabase CMS** (`/admin`) and Supabase auth/commerce.  
 Caddy terminates TLS on the host; Docker serves the app on `127.0.0.1:3010`.
 
 ```
 Internet → Caddy (:443) → 127.0.0.1:3010 → Docker (Express + SPA)
                               ↑
-                    Builder.io CDN + Supabase Cloud (browser)
+                    Supabase (CMS content + auth + orders)
 ```
 
 ## Server layout
@@ -35,9 +35,9 @@ cp .env.example .env
 
 ```bash
 cat > .env << 'EOF'
-VITE_PUBLIC_BUILDER_KEY=paste_your_builder_key_here
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=paste_your_anon_key_here
+CMS_ADMIN_EMAILS=your-admin@email.com
 PORT=3000
 PUBLIC_SITE_URL=https://ameliemilano.com
 SUPABASE_URL=https://your-project.supabase.co
