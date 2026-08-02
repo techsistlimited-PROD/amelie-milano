@@ -14,11 +14,40 @@ export interface FieldConfig {
 export const PRODUCT_CATEGORIES = [
   "Dresses",
   "Occasionwear",
-  "Shoes",
-  "Bags",
   "Body Care",
   "Gym Wear",
+  "Bags",
+  "Shoes",
 ] as const;
+
+export type ProductCategory = (typeof PRODUCT_CATEGORIES)[number];
+
+export const categoryShopPath = (category: string) => {
+  const paths: Record<string, string> = {
+    Dresses: "/shop/dresses",
+    Occasionwear: "/shop/occasionwear",
+    "Body Care": "/shop/body-care",
+    "Gym Wear": "/shop/gym-wear",
+    Bags: "/shop/bags",
+    Shoes: "/shop/shoes",
+  };
+  return paths[category] ?? "/shop";
+};
+
+export const groupRecordsByCategory = (records: Record<string, unknown>[]) => {
+  const groups = PRODUCT_CATEGORIES.map((category) => ({
+    category,
+    shopPath: categoryShopPath(category),
+    items: records.filter((row) => String(row.category ?? "") === category),
+  })).filter((group) => group.items.length > 0);
+
+  const known = new Set<string>(PRODUCT_CATEGORIES);
+  const other = records.filter((row) => !known.has(String(row.category ?? "")));
+  if (other.length) {
+    groups.push({ category: "Uncategorised", shopPath: "/shop", items: other });
+  }
+  return groups;
+};
 
 export const FAQ_CATEGORIES = [
   "Orders & Payments",
@@ -37,13 +66,13 @@ export const resourceMeta: Record<
 > = {
   products: {
     label: "Products",
-    description: "Every item in Shop and homepage rows. Products appear automatically — no manual ID lists.",
+    description: "Add items by type (Dresses, Bags, Shoes…). Each product appears on its matching shop page automatically.",
     previewPath: "/shop",
   },
   collections: {
-    label: "Collections",
-    description: "Banner + title for each /shop/… category page (e.g. /shop/bags). Products appear automatically by category.",
-    previewPath: "/shop/bags",
+    label: "Shop pages",
+    description: "Banner and title for each menu page — Dresses, Bags, Shoes, Body Care, etc.",
+    previewPath: "/shop/dresses",
   },
   editorials: {
     label: "Journal",
@@ -123,14 +152,18 @@ export const fieldsForResource = (
   if (resource === "products") {
     const base: FieldConfig[] = [
       req({ key: "title", label: "Product name" }),
-      { key: "description", label: "Short description", type: "textarea" },
-      req({ key: "priceBdt", label: "Price (BDT)", type: "number" }),
       req({
         key: "category",
-        label: "Category",
+        label: "Product type",
         type: "select",
-        options: PRODUCT_CATEGORIES.map((item) => ({ value: item, label: item })),
+        hint: "Choose the menu section — e.g. Bags shows on /shop/bags only.",
+        options: PRODUCT_CATEGORIES.map((item) => ({
+          value: item,
+          label: `${item} → ${categoryShopPath(item)}`,
+        })),
       }),
+      { key: "description", label: "Short description", type: "textarea" },
+      req({ key: "priceBdt", label: "Price (BDT)", type: "number" }),
       req({ key: "heroImage", label: "Product image", type: "image" }),
       { key: "colour", label: "Colour" },
       { key: "material", label: "Material" },
@@ -170,23 +203,22 @@ export const fieldsForResource = (
     return [
       req({
         key: "slug",
-        label: "Collection page",
+        label: "Shop page",
         type: "select",
         options: [
-          { value: "new-in", label: "/collection/new-in" },
-          { value: "dresses", label: "/collection/dresses" },
-          { value: "occasionwear", label: "/collection/occasionwear" },
-          { value: "gym-wear", label: "/collection/gym-wear" },
-          { value: "bags", label: "/collection/bags" },
-          { value: "shoes", label: "/collection/shoes" },
-          { value: "body-care", label: "/collection/body-care" },
+          { value: "dresses", label: "Dresses → /shop/dresses" },
+          { value: "occasionwear", label: "Occasionwear → /shop/occasionwear" },
+          { value: "body-care", label: "Body Care → /shop/body-care" },
+          { value: "gym-wear", label: "Gym Wear → /shop/gym-wear" },
+          { value: "bags", label: "Bags → /shop/bags" },
+          { value: "shoes", label: "Shoes → /shop/shoes" },
         ],
       }),
-      req({ key: "title", label: "Collection title" }),
+      req({ key: "title", label: "Page title" }),
       { key: "description", label: "Description", type: "textarea" },
       req({ key: "heroImage", label: "Banner image", type: "image" }),
       { key: "editorialCopy", label: "Subtitle above title" },
-      bool("featured", "Featured collection"),
+      bool("featured", "Featured on homepage"),
       bool("isVisible", "Visible on website"),
     ];
   }
@@ -270,8 +302,14 @@ export const listTitleFor = (resource: CmsResource, row: Record<string, unknown>
 };
 
 export const listSubtitleFor = (resource: CmsResource, row: Record<string, unknown>) => {
-  if (resource === "products") return `/product/${row.slug}`;
-  if (resource === "collections") return `/collection/${row.slug}`;
+  if (resource === "products") {
+    const category = String(row.category ?? "");
+    return category ? `${categoryShopPath(category)} · /product/${row.slug}` : `/product/${row.slug}`;
+  }
+  if (resource === "collections") {
+    const slug = String(row.slug ?? "");
+    return slug ? `/shop/${slug}` : "";
+  }
   if (resource === "editorials") return `/journal/${row.slug ?? slugify(String(row.title ?? ""))}`;
   if (resource === "faq") return String(row.category ?? "");
   if (resource === "sections") {

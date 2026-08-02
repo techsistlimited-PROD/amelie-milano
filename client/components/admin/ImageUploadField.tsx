@@ -9,6 +9,8 @@ interface ImageUploadFieldProps {
   required?: boolean;
 }
 
+const MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
+
 const ImageUploadField = ({ value, onChange, label = "Image", required }: ImageUploadFieldProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -16,6 +18,10 @@ const ImageUploadField = ({ value, onChange, label = "Image", required }: ImageU
 
   const handleFile = async (file: File | undefined) => {
     if (!file) return;
+    if (file.size > MAX_UPLOAD_BYTES) {
+      setError(`Image is too large (${(file.size / (1024 * 1024)).toFixed(1)} MB). Maximum is 20 MB.`);
+      return;
+    }
     setError("");
     setUploading(true);
     try {
@@ -55,6 +61,7 @@ const ImageUploadField = ({ value, onChange, label = "Image", required }: ImageU
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />
+      <p className="text-xs text-stone-400">JPG, PNG or WebP · up to 20 MB</p>
       {error && <p className="text-sm text-red-600">{error}</p>}
     </div>
   );

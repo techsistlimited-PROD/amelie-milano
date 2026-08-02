@@ -12,10 +12,13 @@ import {
 } from "@/lib/cms";
 import ImageUploadField from "@/components/admin/ImageUploadField";
 import {
+  categoryShopPath,
   fieldsForResource,
+  groupRecordsByCategory,
   listSubtitleFor,
   listTitleFor,
   preparePayload,
+  PRODUCT_CATEGORIES,
   resourceMeta,
   rowToDraft,
   sectionKeyOptions,
@@ -69,6 +72,7 @@ const ResourceEditor = ({ resource }: { resource: CmsResource }) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
 
   const sectionKey = resource === "sections" ? String(draft.sectionKey ?? "") : "";
   const productSlug = resource === "products" ? String(draft.slug ?? "") : undefined;
@@ -141,6 +145,29 @@ const ResourceEditor = ({ resource }: { resource: CmsResource }) => {
   };
 
   const selectedSection = resource === "sections" ? sectionKeyOptions.find((item) => item.value === draft.sectionKey) : null;
+  const selectedCategory = resource === "products" ? String(draft.category ?? "") : "";
+  const productGroups = resource === "products" ? groupRecordsByCategory(records) : [];
+  const filteredRecords =
+    resource === "products" && categoryFilter !== "all"
+      ? records.filter((row) => String(row.category ?? "") === categoryFilter)
+      : records;
+
+  const renderRow = (row: Record<string, unknown>) => (
+    <tr key={String(row.id)} className="border-t border-stone-100">
+      <td className="px-4 py-3">
+        <p className="font-medium">{listTitleFor(resource, row)}</p>
+        {resource === "products" && row.heroImage && (
+          <img src={String(row.heroImage)} alt="" className="mt-2 h-12 w-12 rounded object-cover" />
+        )}
+      </td>
+      <td className="px-4 py-3 text-stone-500">{listSubtitleFor(resource, row)}</td>
+      <td className="px-4 py-3">{String(row.isVisible ?? true)}</td>
+      <td className="space-x-3 px-4 py-3">
+        <button type="button" className="text-teal underline" onClick={() => edit(row)}>Edit</button>
+        <button type="button" className="text-red-600 underline" onClick={() => remove(String(row.id))}>Delete</button>
+      </td>
+    </tr>
+  );
 
   return (
     <div className="space-y-8">
@@ -163,6 +190,11 @@ const ResourceEditor = ({ resource }: { resource: CmsResource }) => {
         {selectedSection && (
           <p className="md:col-span-2 rounded bg-[#F0E9E2] px-4 py-3 text-sm text-stone-700">
             <strong>On the website:</strong> {selectedSection.location}
+          </p>
+        )}
+        {resource === "products" && selectedCategory && (
+          <p className="md:col-span-2 rounded bg-teal/10 px-4 py-3 text-sm text-stone-700">
+            <strong>Will appear on:</strong> {categoryShopPath(selectedCategory)}
           </p>
         )}
         {fields.map((field) => {
@@ -242,42 +274,87 @@ const ResourceEditor = ({ resource }: { resource: CmsResource }) => {
         </div>
       </form>
 
+      {resource === "products" && (
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setCategoryFilter("all")}
+            className={`px-3 py-1.5 text-xs uppercase tracking-[0.12em] ${categoryFilter === "all" ? "bg-teal text-white" : "bg-white ring-1 ring-stone-200 text-stone-600"}`}
+          >
+            All ({records.length})
+          </button>
+          {PRODUCT_CATEGORIES.map((category) => {
+            const count = records.filter((row) => String(row.category ?? "") === category).length;
+            return (
+              <button
+                key={category}
+                type="button"
+                onClick={() => setCategoryFilter(category)}
+                className={`px-3 py-1.5 text-xs uppercase tracking-[0.12em] ${categoryFilter === category ? "bg-teal text-white" : "bg-white ring-1 ring-stone-200 text-stone-600"}`}
+              >
+                {category} ({count})
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       <div className="overflow-x-auto rounded border border-stone-200 bg-white">
-        <table className="min-w-full text-sm">
-          <thead className="bg-[#F0E9E2] text-left text-xs uppercase tracking-[0.12em] text-stone-600">
-            <tr>
-              <th className="px-4 py-3">Name</th>
-              <th className="px-4 py-3">Where on site</th>
-              <th className="px-4 py-3">Visible</th>
-              <th className="px-4 py-3">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {records.map((row) => (
-              <tr key={String(row.id)} className="border-t border-stone-100">
-                <td className="px-4 py-3">
-                  <p className="font-medium">{listTitleFor(resource, row)}</p>
-                  {resource === "products" && row.heroImage && (
-                    <img src={String(row.heroImage)} alt="" className="mt-2 h-12 w-12 rounded object-cover" />
-                  )}
-                </td>
-                <td className="px-4 py-3 text-stone-500">{listSubtitleFor(resource, row)}</td>
-                <td className="px-4 py-3">{String(row.isVisible ?? true)}</td>
-                <td className="space-x-3 px-4 py-3">
-                  <button type="button" className="text-teal underline" onClick={() => edit(row)}>Edit</button>
-                  <button type="button" className="text-red-600 underline" onClick={() => remove(String(row.id))}>Delete</button>
-                </td>
-              </tr>
-            ))}
-            {!records.length && (
+        {resource === "products" && categoryFilter === "all" ? (
+          productGroups.length ? (
+            <div className="divide-y divide-stone-200">
+              {productGroups.map((group) => (
+                <div key={group.category}>
+                  <div className="flex flex-wrap items-center justify-between gap-3 bg-[#F0E9E2] px-4 py-4">
+                    <div>
+                      <h3 className="font-serif text-xl text-stone-900">{group.category}</h3>
+                      <p className="text-xs text-stone-500">{group.shopPath} · {group.items.length} product{group.items.length === 1 ? "" : "s"}</p>
+                    </div>
+                    <a href={group.shopPath} target="_blank" rel="noreferrer" className="text-xs uppercase tracking-[0.12em] text-teal">
+                      View on site
+                    </a>
+                  </div>
+                  <table className="min-w-full text-sm">
+                    <thead className="text-left text-xs uppercase tracking-[0.12em] text-stone-500">
+                      <tr>
+                        <th className="px-4 py-3">Name</th>
+                        <th className="px-4 py-3">Product link</th>
+                        <th className="px-4 py-3">Visible</th>
+                        <th className="px-4 py-3">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>{group.items.map((row) => renderRow(row))}</tbody>
+                  </table>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="px-4 py-8 text-center text-stone-500">No products yet. Add one above and choose its type (Dresses, Bags, Shoes…).</p>
+          )
+        ) : (
+          <table className="min-w-full text-sm">
+            <thead className="bg-[#F0E9E2] text-left text-xs uppercase tracking-[0.12em] text-stone-600">
               <tr>
-                <td colSpan={4} className="px-4 py-8 text-center text-stone-500">
-                  No records yet. Run <code className="text-teal">node scripts/seed-cms.mjs</code> or add one above.
-                </td>
+                <th className="px-4 py-3">Name</th>
+                <th className="px-4 py-3">Where on site</th>
+                <th className="px-4 py-3">Visible</th>
+                <th className="px-4 py-3">Actions</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredRecords.map((row) => renderRow(row))}
+              {!filteredRecords.length && (
+                <tr>
+                  <td colSpan={4} className="px-4 py-8 text-center text-stone-500">
+                    {resource === "products"
+                      ? "No products in this type yet."
+                      : "No records yet. Run node scripts/seed-cms.mjs or add one above."}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );
