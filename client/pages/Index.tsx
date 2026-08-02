@@ -142,28 +142,12 @@ const Index = () => {
       <Header />
 
       {/* Hero Section */}
-      <section className={`${sectionVisible("homepage-hero") ? "" : "hidden"} relative aspect-[4/3] md:aspect-[3/1] flex items-center justify-center overflow-hidden bg-stone-950`}>
+      <section className={`${sectionVisible("homepage-hero") ? "" : "hidden"} relative aspect-[4/3] md:aspect-[3/1] overflow-hidden bg-stone-950`}>
         <img
           src={hero?.heroImage || "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F41503ed6b6384ec098bdd9f6977128f5?format=webp&width=2000&quality=95"}
-          alt={hero?.title || "Italian Elegance. Bengali Soul."}
+          alt="Amelie Milano"
           className="absolute inset-0 w-full h-full object-cover object-center"
         />
-        <div className="absolute inset-0 bg-black/35" />
-        <div className="relative z-10 mx-auto max-w-3xl px-4 text-center text-white">
-          {hero?.eyebrow && (
-            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.24em] text-teal-200 md:text-xs">
-              {hero.eyebrow}
-            </p>
-          )}
-          <h1 className="font-serif text-3xl font-semibold leading-tight md:text-5xl lg:text-6xl">
-            {hero?.title || "Italian Elegance. Bengali Soul."}
-          </h1>
-          {hero?.body && (
-            <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-stone-100 md:text-base">
-              {hero.body}
-            </p>
-          )}
-        </div>
       </section>
 
       {/* Shop by Category */}

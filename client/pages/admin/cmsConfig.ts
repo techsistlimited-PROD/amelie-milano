@@ -67,7 +67,7 @@ export const resourceMeta: Record<
 };
 
 export const sectionKeyOptions = [
-  { value: "homepage-hero", label: "Homepage → Top hero banner", location: "Banner image + headline at top" },
+  { value: "homepage-hero", label: "Homepage → Top hero banner", location: "Banner image only — no text overlay" },
   { value: "homepage-categories", label: "Homepage → Shop by Category", location: "Heading above category tiles" },
   { value: "homepage-new-arrivals", label: "Homepage → New Arrivals", location: "Product row (auto: New products)" },
   { value: "homepage-best-sellers", label: "Homepage → Best Sellers", location: "Product row (auto: other products)" },
@@ -88,9 +88,6 @@ export const fieldsForSectionKey = (sectionKey: string): FieldConfig[] => {
     case "homepage-hero":
       return [
         req({ key: "heroImage", label: "Banner image", type: "image" }),
-        req({ key: "title", label: "Headline on banner" }),
-        { key: "eyebrow", label: "Small label above headline" },
-        { key: "body", label: "Supporting line", type: "textarea" },
         show,
       ];
     case "homepage-categories":
