@@ -6,9 +6,10 @@ interface ImageUploadFieldProps {
   value: string;
   onChange: (url: string) => void;
   label?: string;
+  required?: boolean;
 }
 
-const ImageUploadField = ({ value, onChange, label = "Image" }: ImageUploadFieldProps) => {
+const ImageUploadField = ({ value, onChange, label = "Image", required }: ImageUploadFieldProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
@@ -29,7 +30,10 @@ const ImageUploadField = ({ value, onChange, label = "Image" }: ImageUploadField
 
   return (
     <div className="md:col-span-2 space-y-3 rounded border border-stone-200 bg-stone-50 p-4">
-      <span className="block text-xs uppercase tracking-[0.12em] text-stone-500">{label}</span>
+      <span className="block text-xs uppercase tracking-[0.12em] text-stone-500">
+        {label}
+        {required && <span className="text-red-600"> *</span>}
+      </span>
       {value && (
         <img src={value} alt="Preview" className="h-32 w-auto max-w-full rounded border border-stone-200 object-cover" />
       )}

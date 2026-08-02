@@ -19,6 +19,7 @@ import {
   resourceMeta,
   rowToDraft,
   sectionKeyOptions,
+  validateDraft,
 } from "./cmsConfig";
 
 const resources: CmsResource[] = ["products", "collections", "editorials", "sections", "pages", "faq"];
@@ -63,12 +64,15 @@ const AdminLogin = ({ onSuccess }: { onSuccess: () => void }) => {
 
 const ResourceEditor = ({ resource }: { resource: CmsResource }) => {
   const meta = resourceMeta[resource];
-  const fields = fieldsForResource(resource);
   const [records, setRecords] = useState<Record<string, unknown>[]>([]);
   const [draft, setDraft] = useState<Record<string, unknown>>({ isVisible: true });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+
+  const sectionKey = resource === "sections" ? String(draft.sectionKey ?? "") : "";
+  const productSlug = resource === "products" ? String(draft.slug ?? "") : undefined;
+  const fields = fieldsForResource(resource, { sectionKey, productSlug, isEdit: Boolean(editingId) });
 
   const load = async () => {
     const token = await getAccessToken();
@@ -95,6 +99,11 @@ const ResourceEditor = ({ resource }: { resource: CmsResource }) => {
     event.preventDefault();
     setError("");
     setNotice("");
+    const missing = validateDraft(resource, draft, { sectionKey });
+    if (missing.length) {
+      setError(`Required: ${missing.join(", ")}`);
+      return;
+    }
     const token = await getAccessToken();
     if (!token) return;
     const payload = preparePayload(resource, draft, !editingId);
@@ -157,19 +166,38 @@ const ResourceEditor = ({ resource }: { resource: CmsResource }) => {
           </p>
         )}
         {fields.map((field) => {
+          const label = (
+            <span className="mb-1 block text-xs uppercase tracking-[0.12em] text-stone-500">
+              {field.label}
+              {field.required && <span className="text-red-600"> *</span>}
+            </span>
+          );
+
           if (field.type === "image") {
             return (
               <ImageUploadField
                 key={field.key}
                 label={field.label}
+                required={field.required}
                 value={String(draft[field.key] ?? "")}
                 onChange={(url) => setDraft({ ...draft, [field.key]: url })}
               />
             );
           }
+
+          if (field.type === "readonly") {
+            return (
+              <div key={field.key} className="block text-sm">
+                {label}
+                {field.hint && <span className="mb-2 block text-xs text-stone-400">{field.hint}</span>}
+                <input className="field w-full bg-stone-100 text-stone-600" readOnly value={String(draft[field.key] ?? field.hint ?? "")} />
+              </div>
+            );
+          }
+
           return (
             <label key={field.key} className={`block text-sm ${field.type === "textarea" ? "md:col-span-2" : ""}`}>
-              <span className="mb-1 block text-xs uppercase tracking-[0.12em] text-stone-500">{field.label}</span>
+              {label}
               {field.hint && <span className="mb-2 block text-xs text-stone-400">{field.hint}</span>}
               {field.type === "boolean" ? (
                 <select

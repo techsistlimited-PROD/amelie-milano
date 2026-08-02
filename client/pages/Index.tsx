@@ -148,6 +148,22 @@ const Index = () => {
           alt={hero?.title || "Italian Elegance. Bengali Soul."}
           className="absolute inset-0 w-full h-full object-cover object-center"
         />
+        <div className="absolute inset-0 bg-black/35" />
+        <div className="relative z-10 mx-auto max-w-3xl px-4 text-center text-white">
+          {hero?.eyebrow && (
+            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.24em] text-teal-200 md:text-xs">
+              {hero.eyebrow}
+            </p>
+          )}
+          <h1 className="font-serif text-3xl font-semibold leading-tight md:text-5xl lg:text-6xl">
+            {hero?.title || "Italian Elegance. Bengali Soul."}
+          </h1>
+          {hero?.body && (
+            <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-stone-100 md:text-base">
+              {hero.body}
+            </p>
+          )}
+        </div>
       </section>
 
       {/* Shop by Category */}
@@ -339,8 +355,8 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-12">
             <div>
-              <h2 className="text-heading text-stone-900 mb-2">Best Sellers</h2>
-              <p className="text-stone-600">Customer favorites and trending pieces</p>
+              <h2 className="text-heading text-stone-900 mb-2">{getSection("homepage-best-sellers")?.title || "Best Sellers"}</h2>
+              <p className="text-stone-600">{getSection("homepage-best-sellers")?.body || "Customer favorites and trending pieces"}</p>
             </div>
             <Link to="/shop?sort=popular" className="hidden md:flex items-center gap-2 text-teal hover:text-teal-dark transition-colors">
               View All <ChevronRight size={20} />
@@ -348,7 +364,7 @@ const Index = () => {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
-            {bestSellers.map((product) => (
+            {homepageBestSellers.map((product) => (
               <ProductCard key={product.id} {...product} />
             ))}
           </div>
@@ -418,8 +434,8 @@ const Index = () => {
           <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
             <div className="relative h-96 md:h-full rounded-lg overflow-hidden">
               <img
-                src="https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F0d417769e65540bd9117838b5867ff55?format=webp&width=1600&quality=90"
-                alt="Luxury Body Care"
+                src={getSection("homepage-body-care")?.heroImage || "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F0d417769e65540bd9117838b5867ff55?format=webp&width=1600&quality=90"}
+                alt={getSection("homepage-body-care")?.title || "Luxury Body Care"}
                 className="w-full h-full object-cover"
               />
             </div>
@@ -428,10 +444,10 @@ const Index = () => {
                 Lifestyle Collection
               </p>
               <h2 className="text-heading text-stone-900 mb-6">
-                Luxury Body Care
+                {getSection("homepage-body-care")?.title || "Luxury Body Care"}
               </h2>
               <p className="text-stone-600 mb-6 leading-relaxed">
-                Elevate your self-care ritual with our carefully curated body care collection. From luxurious oils and butters to premium skincare essentials, each product is selected to nourish and pamper.
+                {getSection("homepage-body-care")?.body || "Elevate your self-care ritual with our carefully curated body care collection. From luxurious oils and butters to premium skincare essentials, each product is selected to nourish and pamper."}
               </p>
               <ul className="space-y-3 mb-8 text-sm text-stone-600">
                 <li className="flex items-start gap-3">

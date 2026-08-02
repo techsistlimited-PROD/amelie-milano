@@ -1,15 +1,35 @@
 import type { CmsResource } from "@/lib/cms";
 
-export type FieldType = "text" | "textarea" | "number" | "boolean" | "image" | "select";
+export type FieldType = "text" | "textarea" | "number" | "boolean" | "image" | "select" | "readonly";
 
 export interface FieldConfig {
   key: string;
   label: string;
   hint?: string;
   type?: FieldType;
+  required?: boolean;
   options?: { value: string; label: string }[];
-  websiteLocation?: string;
 }
+
+export const PRODUCT_CATEGORIES = [
+  "Dresses",
+  "Occasionwear",
+  "Shoes",
+  "Bags",
+  "Body Care",
+  "Gym Wear",
+] as const;
+
+export const FAQ_CATEGORIES = [
+  "Orders & Payments",
+  "Shipping & Delivery",
+  "Returns & Exchanges",
+  "Product Information",
+  "Account & Login",
+  "Promotions & Offers",
+] as const;
+
+export const EDITORIAL_CATEGORIES = ["Fashion", "Style Tips", "Lifestyle", "Editorial"] as const;
 
 export const resourceMeta: Record<
   CmsResource,
@@ -17,77 +37,111 @@ export const resourceMeta: Record<
 > = {
   products: {
     label: "Products",
-    description: "Every item in Shop, product pages, and homepage product rows.",
+    description: "Every item in Shop and homepage rows. Products appear automatically — no manual ID lists.",
     previewPath: "/shop",
   },
   collections: {
     label: "Collections",
-    description: "Editorial landing pages at /collection/… (hero banner + curated product list). NOT the same as /shop/dresses filters page.",
+    description: "Pages at /collection/… — banner + products from the same category (automatic).",
     previewPath: "/collection/dresses",
   },
   editorials: {
     label: "Journal",
-    description: "Articles on /journal and individual story pages.",
+    description: "Articles on /journal.",
     previewPath: "/journal",
   },
   sections: {
     label: "Homepage sections",
-    description: "Blocks on the homepage — hero, categories, new arrivals, etc.",
+    description: "Only fields that appear on the homepage are shown for each block.",
     previewPath: "/",
   },
   pages: {
     label: "Pages",
-    description: "SEO title & description for static pages (About, Policies, etc.).",
+    description: "SEO for static pages.",
   },
   faq: {
     label: "FAQ",
-    description: "Questions and answers on /faq.",
+    description: "Questions on /faq.",
     previewPath: "/faq",
   },
 };
 
 export const sectionKeyOptions = [
-  { value: "homepage-hero", label: "Homepage → Top hero banner", location: "Top of homepage (big image)" },
-  { value: "homepage-categories", label: "Homepage → Shop by Category", location: "6 category tiles below hero" },
-  { value: "homepage-new-arrivals", label: "Homepage → New Arrivals", location: "Product row — links to /shop/new" },
-  { value: "homepage-best-sellers", label: "Homepage → Best Sellers", location: "Second product row on homepage" },
-  { value: "homepage-brand-promise", label: "Homepage → Brand promise", location: "Premium Quality / Fast Delivery / Returns" },
-  { value: "homepage-occasionwear", label: "Homepage → Occasionwear block", location: "Image + text block mid-page" },
-  { value: "homepage-editorial", label: "Homepage → Editorial feature", location: "Journal promo section" },
-  { value: "homepage-style-concierge", label: "Homepage → Style Concierge", location: "Concierge call-to-action" },
-  { value: "homepage-body-care", label: "Homepage → Body Care", location: "Body care promo block" },
-  { value: "homepage-instagram", label: "Homepage → Instagram grid", location: "Social / gallery section" },
+  { value: "homepage-hero", label: "Homepage → Top hero banner", location: "Banner image + headline at top" },
+  { value: "homepage-categories", label: "Homepage → Shop by Category", location: "Heading above category tiles" },
+  { value: "homepage-new-arrivals", label: "Homepage → New Arrivals", location: "Product row (auto: New products)" },
+  { value: "homepage-best-sellers", label: "Homepage → Best Sellers", location: "Product row (auto: other products)" },
+  { value: "homepage-brand-promise", label: "Homepage → Brand promise", location: "Show/hide quality row" },
+  { value: "homepage-occasionwear", label: "Homepage → Occasionwear", location: "Text + image block" },
+  { value: "homepage-editorial", label: "Homepage → Editorial", location: "Show/hide Amelie Edit block" },
+  { value: "homepage-style-concierge", label: "Homepage → Style Concierge", location: "Show/hide concierge block" },
+  { value: "homepage-body-care", label: "Homepage → Body Care", location: "Show/hide body care block" },
+  { value: "homepage-instagram", label: "Homepage → Instagram", location: "Show/hide Instagram grid" },
 ];
 
-const bool = (key: string, label: string, hint?: string): FieldConfig => ({
-  key,
-  label,
-  hint,
-  type: "boolean",
-});
+const bool = (key: string, label: string): FieldConfig => ({ key, label, type: "boolean" });
+const req = (field: FieldConfig): FieldConfig => ({ ...field, required: true });
 
-export const fieldsForResource = (resource: CmsResource): FieldConfig[] => {
+export const fieldsForSectionKey = (sectionKey: string): FieldConfig[] => {
+  const show = bool("isVisible", "Show on homepage");
+  switch (sectionKey) {
+    case "homepage-hero":
+      return [
+        req({ key: "heroImage", label: "Banner image", type: "image" }),
+        req({ key: "title", label: "Headline on banner" }),
+        { key: "eyebrow", label: "Small label above headline" },
+        { key: "body", label: "Supporting line", type: "textarea" },
+        show,
+      ];
+    case "homepage-categories":
+      return [
+        req({ key: "title", label: "Section heading" }),
+        { key: "body", label: "Description", type: "textarea" },
+        show,
+      ];
+    case "homepage-new-arrivals":
+    case "homepage-best-sellers":
+      return [
+        req({ key: "title", label: "Section heading" }),
+        { key: "body", label: "Description", type: "textarea" },
+        show,
+      ];
+    case "homepage-occasionwear":
+    case "homepage-body-care":
+      return [
+        req({ key: "title", label: "Heading" }),
+        req({ key: "body", label: "Description", type: "textarea" }),
+        req({ key: "heroImage", label: "Feature image", type: "image" }),
+        show,
+      ];
+    default:
+      return [show];
+  }
+};
+
+export const fieldsForResource = (
+  resource: CmsResource,
+  context: { sectionKey?: string; productSlug?: string; isEdit?: boolean } = {},
+): FieldConfig[] => {
   if (resource === "products") {
-    return [
-      { key: "slug", label: "Product ID (URL)", hint: "Used in /product/THIS — e.g. 1, shoe-1, bag-1" },
-      { key: "title", label: "Product name", hint: "Shown on shop cards and product page" },
-      { key: "description", label: "Short description", hint: "Tagline under the product name", type: "textarea" },
-      { key: "priceBdt", label: "Price (BDT)", type: "number" },
-      { key: "category", label: "Category", hint: "Dresses, Shoes, Bags, Body Care, Gym Wear, Occasionwear" },
-      { key: "heroImage", label: "Product image", hint: "Upload from computer or paste a URL", type: "image" },
-      { key: "colour", label: "Colour", hint: "Shown on product card and used in colour filter" },
+    const base: FieldConfig[] = [
+      req({ key: "title", label: "Product name" }),
+      { key: "description", label: "Short description", type: "textarea" },
+      req({ key: "priceBdt", label: "Price (BDT)", type: "number" }),
+      req({
+        key: "category",
+        label: "Category",
+        type: "select",
+        options: PRODUCT_CATEGORIES.map((item) => ({ value: item, label: item })),
+      }),
+      req({ key: "heroImage", label: "Product image", type: "image" }),
+      { key: "colour", label: "Colour" },
       { key: "material", label: "Material" },
-      { key: "sizes", label: "Available sizes", hint: "Comma-separated: XS,S,M,L,XL" },
-      { key: "occasions", label: "Occasions", hint: "Comma-separated: Evening,Daywear,Occasion" },
       {
         key: "length",
         label: "Dress length",
         type: "select",
-        options: [
-          { value: "Mini", label: "Mini" },
-          { value: "Midi", label: "Midi" },
-          { value: "Maxi", label: "Maxi" },
-        ],
+        options: [{ value: "", label: "N/A" }, { value: "Mini", label: "Mini" }, { value: "Midi", label: "Midi" }, { value: "Maxi", label: "Maxi" }],
       },
       {
         key: "availability",
@@ -99,85 +153,114 @@ export const fieldsForResource = (resource: CmsResource): FieldConfig[] => {
           { value: "Out of Stock", label: "Out of Stock" },
         ],
       },
-      { key: "salePriceBdt", label: "Sale price (BDT)", hint: "Leave empty if not on sale", type: "number" },
+      { key: "salePriceBdt", label: "Sale price (BDT)", type: "number" },
       {
         key: "badge",
-        label: "Badge label",
+        label: "Badge",
         type: "select",
-        options: [
-          { value: "", label: "None" },
-          { value: "New", label: "New" },
-          { value: "Sale", label: "Sale" },
-          { value: "Low Stock", label: "Low Stock" },
-        ],
+        options: [{ value: "", label: "None" }, { value: "New", label: "New" }, { value: "Sale", label: "Sale" }, { value: "Low Stock", label: "Low Stock" }],
       },
-      bool("isNew", "Show in New In", "Appears in /shop/new and New In filters"),
+      bool("isNew", "Show in New In"),
       bool("isVisible", "Visible on website"),
     ];
+    if (context.isEdit && context.productSlug) {
+      return [{ key: "slug", label: "Product URL", type: "readonly", hint: `/product/${context.productSlug}` }, ...base];
+    }
+    return base;
   }
+
   if (resource === "collections") {
     return [
-      { key: "slug", label: "Collection ID (URL)", hint: "Used in /collection/THIS — e.g. dresses, bags. Note: /shop/dresses is a separate category page." },
-      { key: "title", label: "Collection title", hint: "Hero heading on /collection/… page" },
+      req({
+        key: "slug",
+        label: "Collection page",
+        type: "select",
+        options: [
+          { value: "new-in", label: "/collection/new-in" },
+          { value: "dresses", label: "/collection/dresses" },
+          { value: "occasionwear", label: "/collection/occasionwear" },
+          { value: "gym-wear", label: "/collection/gym-wear" },
+          { value: "bags", label: "/collection/bags" },
+          { value: "shoes", label: "/collection/shoes" },
+          { value: "body-care", label: "/collection/body-care" },
+        ],
+      }),
+      req({ key: "title", label: "Collection title" }),
       { key: "description", label: "Description", type: "textarea" },
-      { key: "heroImage", label: "Banner image", type: "image" },
-      { key: "editorialCopy", label: "Subtitle / kicker" },
-      { key: "productSlugs", label: "Product IDs (comma-separated)", hint: "Controls which products appear on /collection/… AND /shop/dresses (for dresses collection)" },
+      req({ key: "heroImage", label: "Banner image", type: "image" }),
+      { key: "editorialCopy", label: "Subtitle above title" },
       bool("featured", "Featured collection"),
       bool("isVisible", "Visible on website"),
     ];
   }
+
   if (resource === "editorials") {
     return [
-      { key: "slug", label: "Article URL slug", hint: "Used in /journal/THIS — e.g. italian-tailoring" },
-      { key: "title", label: "Article title" },
-      { key: "excerpt", label: "Summary", type: "textarea" },
-      { key: "heroImage", label: "Cover image", type: "image" },
-      { key: "category", label: "Category tag", hint: "Fashion, Lifestyle, Style Tips, Editorial" },
+      req({ key: "title", label: "Article title" }),
+      req({ key: "excerpt", label: "Summary", type: "textarea" }),
+      req({ key: "heroImage", label: "Cover image", type: "image" }),
+      req({
+        key: "category",
+        label: "Category",
+        type: "select",
+        options: EDITORIAL_CATEGORIES.map((item) => ({ value: item, label: item })),
+      }),
       { key: "author", label: "Author" },
-      bool("featured", "Featured on Journal page"),
+      bool("featured", "Featured on Journal"),
       bool("isVisible", "Visible on website"),
     ];
   }
+
   if (resource === "sections") {
+    const key = context.sectionKey ?? "";
+    if (!key) {
+      return [
+        req({
+          key: "sectionKey",
+          label: "Which homepage block?",
+          type: "select",
+          options: sectionKeyOptions.map((item) => ({ value: item.value, label: item.label })),
+        }),
+        bool("isVisible", "Show on homepage"),
+      ];
+    }
     return [
       {
         key: "sectionKey",
-        label: "Which homepage block?",
+        label: "Homepage block",
         type: "select",
         options: sectionKeyOptions.map((item) => ({ value: item.value, label: item.label })),
       },
-      { key: "title", label: "Heading text" },
-      { key: "eyebrow", label: "Small label above heading" },
-      { key: "subheading", label: "Subheading" },
-      { key: "body", label: "Body text", type: "textarea" },
-      { key: "heroImage", label: "Section image", hint: "Hero / feature image for this block", type: "image" },
-      {
-        key: "productSlugs",
-        label: "Product IDs (optional order)",
-        hint: "Optional — pin products first e.g. 1,2,3. New products in the same category still appear automatically.",
-      },
-      bool("isVisible", "Show this section on homepage"),
-      { key: "displayOrder", label: "Sort order", type: "number" },
+      ...fieldsForSectionKey(key),
     ];
   }
+
   if (resource === "pages") {
     return [
-      { key: "path", label: "Page path", hint: "e.g. /about, /shipping, /privacy" },
-      { key: "title", label: "Page title" },
-      { key: "seoTitle", label: "SEO title (Google)" },
+      req({ key: "path", label: "Page path" }),
+      req({ key: "title", label: "Page title" }),
+      { key: "seoTitle", label: "SEO title" },
       { key: "seoDescription", label: "SEO description", type: "textarea" },
       bool("isVisible", "Visible"),
     ];
   }
+
   return [
-    { key: "category", label: "FAQ group", hint: "Orders & Payments, Shipping & Delivery, etc." },
-    { key: "question", label: "Question" },
-    { key: "answer", label: "Answer", type: "textarea" },
+    req({
+      key: "category",
+      label: "FAQ group",
+      type: "select",
+      options: FAQ_CATEGORIES.map((item) => ({ value: item, label: item })),
+    }),
+    req({ key: "question", label: "Question" }),
+    req({ key: "answer", label: "Answer", type: "textarea" }),
     { key: "displayOrder", label: "Sort order", type: "number" },
     bool("isVisible", "Visible on /faq"),
   ];
 };
+
+export const slugify = (value: string) =>
+  value.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "item";
 
 export const listTitleFor = (resource: CmsResource, row: Record<string, unknown>) => {
   if (resource === "faq") return String(row.question ?? "Untitled");
@@ -192,7 +275,7 @@ export const listTitleFor = (resource: CmsResource, row: Record<string, unknown>
 export const listSubtitleFor = (resource: CmsResource, row: Record<string, unknown>) => {
   if (resource === "products") return `/product/${row.slug}`;
   if (resource === "collections") return `/collection/${row.slug}`;
-  if (resource === "editorials") return `/journal/${row.slug}`;
+  if (resource === "editorials") return `/journal/${row.slug ?? slugify(String(row.title ?? ""))}`;
   if (resource === "faq") return String(row.category ?? "");
   if (resource === "sections") {
     const key = String(row.sectionKey ?? "");
@@ -201,35 +284,38 @@ export const listSubtitleFor = (resource: CmsResource, row: Record<string, unkno
   return "";
 };
 
+export const validateDraft = (resource: CmsResource, draft: Record<string, unknown>, context: { sectionKey?: string } = {}) => {
+  return fieldsForResource(resource, { ...context, isEdit: Boolean(draft.id) })
+    .filter((field) => field.required && field.type !== "readonly")
+    .filter((field) => {
+      const value = draft[field.key];
+      return value === undefined || value === null || value === "";
+    })
+    .map((field) => field.label);
+};
+
 export const preparePayload = (resource: CmsResource, draft: Record<string, unknown>, isNew = false) => {
+  const sectionKey = String(draft.sectionKey ?? "");
+  const fields = fieldsForResource(resource, { sectionKey, isEdit: !isNew });
   const payload: Record<string, unknown> = {};
-  for (const field of fieldsForResource(resource)) {
+
+  for (const field of fields) {
+    if (field.type === "readonly") continue;
     const value = draft[field.key];
     if (value === undefined || value === "") continue;
-    if (field.key === "productSlugs" && typeof value === "string") {
-      payload.productSlugs = value.split(",").map((item) => item.trim()).filter(Boolean);
-      continue;
-    }
-    if ((field.key === "sizes" || field.key === "occasions") && typeof value === "string") {
-      payload[field.key] = value.split(",").map((item) => item.trim()).filter(Boolean);
-      continue;
-    }
     payload[field.key] = value;
   }
+
   if (isNew && payload.isVisible === undefined) payload.isVisible = true;
-  if (resource === "products" && isNew && payload.priceBdt === undefined) payload.priceBdt = 0;
+  if (resource === "products" && isNew) {
+    payload.slug = slugify(String(draft.title ?? "product"));
+    if (payload.priceBdt === undefined) payload.priceBdt = 0;
+  }
+  if (resource === "editorials" && isNew && draft.title) {
+    payload.slug = slugify(String(draft.title));
+  }
+
   return payload;
 };
 
-export const rowToDraft = (resource: CmsResource, row: Record<string, unknown>) => {
-  const draft = { ...row };
-  if (resource === "collections" || resource === "sections") {
-    const slugs = row.productSlugs ?? row.productReferences;
-    if (Array.isArray(slugs)) draft.productSlugs = slugs.join(", ");
-  }
-  if (resource === "products") {
-    if (Array.isArray(row.sizes)) draft.sizes = row.sizes.join(", ");
-    if (Array.isArray(row.occasions)) draft.occasions = row.occasions.join(", ");
-  }
-  return draft;
-};
+export const rowToDraft = (resource: CmsResource, row: Record<string, unknown>) => ({ ...row });
