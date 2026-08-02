@@ -10,14 +10,16 @@ import { fetchBuilderCollection, fetchBuilderProducts, type BuilderCollectionDat
 import { resolveCollectionProducts, sortByDisplayOrder } from "@/lib/cmsCatalog";
 import type { CmsProduct } from "@/lib/cms";
 
+import { categoryMap } from "@/lib/categoryConfig";
+
 const collectionMap = {
   new: { title: "New In", kicker: "The latest chapter", copy: "A first look at the newest silhouettes, considered details, and fresh perspectives entering the Amelie wardrobe.", image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F9bd2b790b1514a22af7615257f60ceaf?format=webp&width=1800&height=1100&quality=95", category: "New In", builderSlug: "new-in" },
-  dresses: { title: "The Dress Collection", kicker: "Signature silhouettes", copy: "Fluid drapes, sculpted lines, and quiet drama for every kind of day.", image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F1402e9f761a74a90bece95b695aaece8?format=webp&width=1800&height=1100&quality=95", category: "Dresses", builderSlug: "dresses" },
-  occasionwear: { title: "Occasionwear", kicker: "Made for the moment", copy: "Refined pieces designed for the evenings, celebrations, and entrances you will remember.", image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F21ada796a3144e7c95cbfbeb0f436fe6?format=webp&width=1800&height=1100&quality=95", category: "Occasionwear", builderSlug: "occasionwear" },
-  "gym-wear": { title: "Movement Edit", kicker: "A stronger kind of ease", copy: "Performance pieces with a polished point of view, made to move from studio to street.", image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Fdcf230d68b79461a81796291c421c11e?format=webp&width=1800&height=1100&quality=95", category: "Gym Wear", builderSlug: "gym-wear" },
-  bags: { title: "The Bag Edit", kicker: "The considered finishing touch", copy: "Evening clutches with texture and presence.", image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F3988c05f36f646f7a4b4e3d2bb4d5577?format=webp&width=1800&height=1100&quality=95", category: "Bags", builderSlug: "bags" },
-  shoes: { title: "The Shoe Edit", kicker: "Sculptural finishing pieces", copy: "From minimalist slingbacks to gilded platforms.", image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Fa188b5e269974be1a7c523bdc5828e29?format=webp&width=1800&height=1100&quality=95", category: "Shoes", builderSlug: "shoes" },
-  "body-care": { title: "Body Care Rituals", kicker: "Elevate your self-care", copy: "Indulgent fragrances, textures and botanical care.", image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F0d417769e65540bd9117838b5867ff55?format=webp&width=1800&height=1100&quality=95", category: "Body Care", builderSlug: "body-care" },
+  ...Object.fromEntries(
+    Object.entries(categoryMap).map(([key, config]) => [
+      key,
+      { title: config.title, kicker: config.kicker, copy: config.description, image: config.fallbackImage, category: config.category, builderSlug: config.slug },
+    ]),
+  ),
 } as const;
 
 type FallbackCollection = (typeof collectionMap)[keyof typeof collectionMap];

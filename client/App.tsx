@@ -14,11 +14,7 @@ import Shop from "./pages/Shop";
 import Product from "./pages/Product";
 import Category from "./pages/Category";
 import NewIn from "./pages/NewIn";
-import Occasionwear from "./pages/Occasionwear";
-import BodyCare from "./pages/BodyCare";
-import GymWear from "./pages/GymWear";
-import Bags from "./pages/Bags";
-import Shoes from "./pages/Shoes";
+import ShopCategory from "./pages/ShopCategory";
 import TheAmelieEdit from "./pages/TheAmelieEdit";
 import Collection from "./pages/Collection";
 import Cart from "./pages/Cart";
@@ -70,12 +66,8 @@ const App = () => (
           <Route path="/" element={<BuilderRouteContent><Index /></BuilderRouteContent>} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/shop/new" element={<NewIn />} />
-          <Route path="/shop/occasionwear" element={<Occasionwear />} />
-          <Route path="/shop/body-care" element={<BodyCare />} />
-          <Route path="/shop/gym-wear" element={<GymWear />} />
-          <Route path="/shop/bags" element={<Bags />} />
-          <Route path="/shop/shoes" element={<Shoes />} />
-          <Route path="/shop/:category" element={<Category />} />
+          <Route path="/shop/dresses" element={<Category />} />
+          <Route path="/shop/:category" element={<ShopCategory />} />
           <Route path="/product/:id" element={<Product />} />
           <Route path="/collection/:id" element={<BuilderRouteContent><Collection /></BuilderRouteContent>} />
           <Route path="/cart" element={<Cart />} />

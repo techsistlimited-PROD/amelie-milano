@@ -42,8 +42,8 @@ export const resourceMeta: Record<
   },
   collections: {
     label: "Collections",
-    description: "Pages at /collection/… — banner + products from the same category (automatic).",
-    previewPath: "/collection/dresses",
+    description: "Banner + title for each /shop/… category page (e.g. /shop/bags). Products appear automatically by category.",
+    previewPath: "/shop/bags",
   },
   editorials: {
     label: "Journal",

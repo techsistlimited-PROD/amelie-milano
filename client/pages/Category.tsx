@@ -5,7 +5,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useWishlist } from "@/lib/wishlist";
 import PlaceholderPage from "./PlaceholderPage";
-import { fetchBuilderCollection, fetchBuilderProducts } from "@/lib/builder";
+import { fetchBuilderCollection, fetchBuilderProducts, type BuilderCollectionData } from "@/lib/builder";
+import { getCategoryConfig } from "@/lib/categoryConfig";
 import { CatalogProduct, cmsToCatalog, filterCatalogProducts, sortCatalogProducts } from "@/lib/catalogProduct";
 import { resolveCollectionProducts, sortByDisplayOrder } from "@/lib/cmsCatalog";
 
@@ -87,6 +88,8 @@ const Category = () => {
   const [sort, setSort] = useState("Featured");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [dressProducts, setDressProducts] = useState<CatalogProduct[]>([]);
+  const [cmsCollection, setCmsCollection] = useState<BuilderCollectionData | null>(null);
+  const dressConfig = getCategoryConfig("dresses");
 
   useEffect(() => {
     if (category !== "dresses") return;
@@ -95,6 +98,7 @@ const Category = () => {
         fetchBuilderCollection("dresses"),
         fetchBuilderProducts(),
       ]);
+      if (collection) setCmsCollection(collection);
       const sorted = sortByDisplayOrder(allProducts);
       const cards = resolveCollectionProducts(collection?.products, sorted, "Dresses");
       if (cards.length) {
@@ -151,6 +155,11 @@ const Category = () => {
     );
   }
 
+  const bannerTitle = cmsCollection?.title || dressConfig?.title || "The Dress Collection";
+  const bannerCopy = cmsCollection?.description || dressConfig?.description || "Discover refined silhouettes, soft drapes, sculpted fits and timeless pieces designed for modern feminine confidence.";
+  const bannerKicker = cmsCollection?.editorialCopy || dressConfig?.kicker || "Dresses";
+  const bannerImage = cmsCollection?.heroImage || dressConfig?.fallbackImage || "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F87192a4e5d0949b8b89c181ebaa5ef28?format=webp&width=1200&height=1600";
+
   return (
     <div className="min-h-screen bg-ivory">
       <Header />
@@ -160,12 +169,12 @@ const Category = () => {
           <div className="container mx-auto px-4 py-14 md:py-20 lg:py-24">
             <div className="grid md:grid-cols-[0.9fr_1.1fr] gap-10 md:gap-16 items-center">
               <div className="max-w-xl">
-                <p className="text-teal text-[10px] font-semibold uppercase tracking-[0.24em] mb-5">Dresses</p>
+                <p className="text-teal text-[10px] font-semibold uppercase tracking-[0.24em] mb-5">{bannerKicker}</p>
                 <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl text-stone-900 leading-[0.92] mb-6">
-                  Italian Elegance for Every Occasion
+                  {bannerTitle}
                 </h1>
                 <p className="text-stone-600 leading-relaxed max-w-md mb-8">
-                  Discover refined silhouettes, soft drapes, sculpted fits and timeless pieces designed for modern feminine confidence.
+                  {bannerCopy}
                 </p>
                 <div className="flex flex-wrap gap-3">
                   <Link to="/shop/new" className="btn-primary">Shop New Arrivals</Link>
@@ -175,8 +184,8 @@ const Category = () => {
               <div className="relative md:pl-8">
                 <div className="absolute -top-5 -right-2 w-32 h-32 rounded-full border border-teal/20" />
                 <img
-                  src="https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F87192a4e5d0949b8b89c181ebaa5ef28?format=webp&width=1200&height=1600"
-                  alt="Amelie Milano dresses"
+                  src={bannerImage}
+                  alt={bannerTitle}
                   className="relative w-full aspect-[4/5] object-cover rounded-sm"
                 />
               </div>

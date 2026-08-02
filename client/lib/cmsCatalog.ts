@@ -54,6 +54,8 @@ export const resolveSectionProducts = (
 };
 
 /** Collection page — listed slugs first, then same-category products from CMS. */
+const normalizeCategory = (value: string) => value.toLowerCase().trim().replace(/\s+/g, " ");
+
 export const resolveCollectionProducts = (
   slugList: string[] | undefined,
   allProducts: CmsProduct[],
@@ -66,10 +68,11 @@ export const resolveCollectionProducts = (
     .filter((product): product is CmsProduct => Boolean(product));
 
   const seen = new Set(listed.map((product) => product.slug));
+  const target = normalizeCategory(categoryLabel);
   const categoryMatches =
     categoryLabel === "New In"
       ? allProducts.filter((product) => product.isNew)
-      : allProducts.filter((product) => product.category === categoryLabel);
+      : allProducts.filter((product) => normalizeCategory(product.category) === target);
 
   const merged = [...listed];
   for (const product of sortByDisplayOrder(categoryMatches)) {
