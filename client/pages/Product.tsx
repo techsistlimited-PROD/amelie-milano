@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import { addToCart } from "@/lib/cart";
 import { useWishlist } from "@/lib/wishlist";
 import { fetchBuilderProduct, type BuilderProductData, fetchBuilderProducts } from "@/lib/builder";
+import { defaultOptionForCategory, getProductOptions } from "@/lib/productFields";
 
 const productCatalog = {
   "1": { name: "Espresso Drape Kaftan Dress", price: 8375, category: "Dresses", tagline: "A fluid silhouette with effortless evening movement.", material: "Silk-touch satin", colour: "Espresso", image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2Fca01513621cd4cd19c92e5bb2129ea91?format=webp&width=1000&height=1400" },
@@ -34,7 +35,12 @@ const productCatalog = {
   "signature-mist": { name: "Milano Signature Body Mist", price: 3900, category: "Body Care", tagline: "A delicate veil of signature fragrance for the skin.", material: "Scented body mist", colour: "Clear", image: "https://images.unsplash.com/photo-1612817288484-6f916006741a?w=1000&h=1400&fit=crop" },
 };
 
-type Product = (typeof productCatalog)[keyof typeof productCatalog] & { salePrice?: number };
+type Product = (typeof productCatalog)[keyof typeof productCatalog] & {
+  salePrice?: number;
+  sizes?: string[];
+  length?: string;
+  stylingTips?: string;
+};
 
 const responsiveSrcSet = (source: string) => source.includes("cdn.builder.io")
   ? [400, 800, 1200, 1600].map((width) => `${source.replace(/width=\d+/, `width=${width}`)} ${width}w`).join(", ")
@@ -85,29 +91,30 @@ const ProductPage = () => {
         material: cmsProduct.material ?? "Amelie Milano signature finish",
         colour: cmsProduct.colour ?? cmsProduct.variants?.[0]?.color ?? "Signature",
         image: cmsProduct.heroImage,
+        sizes: cmsProduct.sizes ?? [],
+        length: cmsProduct.length,
+        stylingTips: cmsProduct.stylingTips,
       }
     : fallbackProduct;
   const onSale = product.salePrice != null && product.salePrice < product.price;
   const displayPrice = onSale ? product.salePrice! : product.price;
-  const [size, setSize] = useState("M");
+  const optionConfig = getProductOptions(product.category, product.sizes ?? []);
+  const [size, setSize] = useState(defaultOptionForCategory(product.category, product.sizes ?? []));
   const [colour, setColour] = useState(product.colour);
   const { saved, toggle: toggleWishlist } = useWishlist({ id, name: product.name, price: displayPrice, image: product.image, category: product.category, colour: product.colour, option: size });
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
   const [addedToCart, setAddedToCart] = useState(false);
   const images = [product.image, product.image, product.image];
-  const isBodyCare = product.category === "Body Care";
-  const isBag = product.category === "Bags";
-  const optionLabel = isBodyCare ? "Volume" : isBag ? "Details" : "Size";
-  const optionValues = isBodyCare ? ["100ml", "200ml", "300ml"] : isBag ? ["One Size"] : ["XS", "S", "M", "L", "XL"];
+  const isDressLike = product.category === "Dresses" || product.category === "Occasionwear";
 
   useEffect(() => {
-    setSize(isBodyCare ? "100ml" : isBag ? "One Size" : "M");
+    setSize(defaultOptionForCategory(product.category, product.sizes ?? []));
     setColour(product.colour);
     setQuantity(1);
     setActiveImage(0);
     setAddedToCart(false);
-  }, [id, isBodyCare, isBag, product.colour]);
+  }, [id, product.category, product.colour, product.sizes]);
 
   useEffect(() => {
     const description = product.tagline || `Shop ${product.name} from Amelie Milano.`;
@@ -139,7 +146,7 @@ const ProductPage = () => {
   };
 
   return <div className="min-h-screen bg-[#F0E9E2] text-[#0F0F0F]"><Header /><main>
-    <section className="bg-white py-8 md:py-16"><div className="container mx-auto px-4"><div className="mb-6 text-xs text-stone-500"><Link to="/" className="hover:text-teal">Home</Link><span className="mx-2">/</span><Link to={`/shop/${product.category.toLowerCase().replace(" ", "-")}`} className="hover:text-teal">{product.category}</Link><span className="mx-2">/</span><span>{product.name}</span></div><div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-start"><div className="grid grid-cols-[72px_1fr] gap-4 lg:sticky lg:top-6"><div className="space-y-3">{images.map((image, index) => <button key={`${image}-${index}`} type="button" onClick={() => setActiveImage(index)} className={`block w-full overflow-hidden border ${activeImage === index ? "border-teal" : "border-transparent"}`}><img src={image} srcSet={responsiveSrcSet(image)} decoding="async" alt={`${product.name} view ${index + 1}`} className="w-full aspect-[3/4] object-cover" /></button>)}</div><div className="relative overflow-hidden bg-white"><img src={images[activeImage]} alt={product.name} className="w-full aspect-[3/4] object-cover hover:scale-105 transition-transform duration-700" /><span className="absolute bottom-4 left-4 bg-white/90 px-3 py-1 text-[10px] uppercase tracking-[0.14em] text-stone-600">Move to zoom</span></div></div><div className="max-w-xl pt-2"><p className="text-teal text-[10px] uppercase tracking-[0.24em] mb-4">{product.category} · New Arrival</p><h1 className="font-serif text-4xl md:text-6xl leading-[0.95] mb-4">{product.name}</h1><p className="font-serif italic text-xl text-stone-600 mb-6">{product.tagline}</p><p className="text-xl text-stone-900 mb-8">{onSale ? (<><span className="text-stone-400 line-through text-lg mr-3">BDT {product.price.toLocaleString()}</span><span className="font-semibold text-teal">BDT {product.salePrice!.toLocaleString()}</span></>) : <>BDT {product.price.toLocaleString()}</>}</p><div className="space-y-7 border-y border-stone-200 py-7"><div><p className="text-xs uppercase tracking-[0.16em] mb-3">Colour: <span className="normal-case tracking-normal text-stone-600">{colour}</span></p><div className="flex gap-2"><button type="button" onClick={() => setColour(product.colour)} className="w-7 h-7 rounded-full border-2 border-teal bg-stone-800" aria-label={`Select ${product.colour}`} /><button type="button" onClick={() => setColour("Ivory")} className="w-7 h-7 rounded-full border border-stone-300 bg-[#eee7dc]" aria-label="Select Ivory" /></div></div><div><div className="flex justify-between mb-3"><p className="text-xs uppercase tracking-[0.16em]">{optionLabel}: <span className="normal-case tracking-normal text-stone-600">{size}</span></p><button type="button" className="text-xs text-teal underline">Size Guide</button></div><div className="flex gap-2">{optionValues.map((option) => <button key={option} type="button" onClick={() => setSize(option)} className={`w-12 h-11 border text-sm ${size === option ? "border-teal bg-teal text-white" : "border-stone-300 hover:border-teal"}`}>{option}</button>)}</div></div></div><div className="flex gap-3 mt-8"><div className="flex items-center border border-stone-300"><button type="button" onClick={() => setQuantity(Math.max(1, quantity - 1))} className="p-3"><Minus size={14} /></button><span className="w-8 text-center text-sm">{quantity}</span><button type="button" onClick={() => setQuantity(quantity + 1)} className="p-3"><Plus size={14} /></button></div><button type="button" onClick={handleAddToCart} className="flex-1 bg-teal px-6 py-4 text-xs uppercase tracking-[0.16em] text-white hover:bg-teal-dark transition-colors">{addedToCart ? "Added to Cart" : "Add to Cart"}</button><button type="button" onClick={() => toggleWishlist()} aria-label="Add to wishlist" className="border border-stone-300 px-4 text-stone-700 hover:text-teal"><Heart className={saved ? "fill-teal text-teal" : ""} /></button></div><p className="text-xs text-stone-500 mt-4">Complimentary delivery on orders over BDT 3,000.</p></div></div></div></section>
+    <section className="bg-white py-8 md:py-16"><div className="container mx-auto px-4"><div className="mb-6 text-xs text-stone-500"><Link to="/" className="hover:text-teal">Home</Link><span className="mx-2">/</span><Link to={`/shop/${product.category.toLowerCase().replace(" ", "-")}`} className="hover:text-teal">{product.category}</Link><span className="mx-2">/</span><span>{product.name}</span></div><div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-start"><div className="grid grid-cols-[72px_1fr] gap-4 lg:sticky lg:top-6"><div className="space-y-3">{images.map((image, index) => <button key={`${image}-${index}`} type="button" onClick={() => setActiveImage(index)} className={`block w-full overflow-hidden border ${activeImage === index ? "border-teal" : "border-transparent"}`}><img src={image} srcSet={responsiveSrcSet(image)} decoding="async" alt={`${product.name} view ${index + 1}`} className="w-full aspect-[3/4] object-cover" /></button>)}</div><div className="relative overflow-hidden bg-white"><img src={images[activeImage]} alt={product.name} className="w-full aspect-[3/4] object-cover hover:scale-105 transition-transform duration-700" /><span className="absolute bottom-4 left-4 bg-white/90 px-3 py-1 text-[10px] uppercase tracking-[0.14em] text-stone-600">Move to zoom</span></div></div><div className="max-w-xl pt-2"><p className="text-teal text-[10px] uppercase tracking-[0.24em] mb-4">{product.category} · New Arrival</p><h1 className="font-serif text-4xl md:text-6xl leading-[0.95] mb-4">{product.name}</h1><p className="font-serif italic text-xl text-stone-600 mb-6">{product.tagline}</p><p className="text-xl text-stone-900 mb-8">{onSale ? (<><span className="text-stone-400 line-through text-lg mr-3">BDT {product.price.toLocaleString()}</span><span className="font-semibold text-teal">BDT {product.salePrice!.toLocaleString()}</span></>) : <>BDT {product.price.toLocaleString()}</>}</p><div className="space-y-7 border-y border-stone-200 py-7"><div><p className="text-xs uppercase tracking-[0.16em] mb-3">Colour: <span className="normal-case tracking-normal text-stone-600">{colour}</span></p><div className="flex gap-2"><button type="button" onClick={() => setColour(product.colour)} className="w-7 h-7 rounded-full border-2 border-teal bg-stone-800" aria-label={`Select ${product.colour}`} /><button type="button" onClick={() => setColour("Ivory")} className="w-7 h-7 rounded-full border border-stone-300 bg-[#eee7dc]" aria-label="Select Ivory" /></div></div><div><div className="flex justify-between mb-3"><p className="text-xs uppercase tracking-[0.16em]">{optionConfig.label}: <span className="normal-case tracking-normal text-stone-600">{size}</span></p>{optionConfig.showSizeGuide && <button type="button" className="text-xs text-teal underline">Size Guide</button>}</div><div className="flex flex-wrap gap-2">{optionConfig.values.map((option) => <button key={option} type="button" onClick={() => setSize(option)} className={`min-w-12 h-11 px-2 border text-sm ${size === option ? "border-teal bg-teal text-white" : "border-stone-300 hover:border-teal"}`}>{option}</button>)}</div></div>{isDressLike && product.length && <p className="text-sm text-stone-600"><strong className="text-stone-900">Length:</strong> {product.length}</p>}{product.category === "Bags" && product.stylingTips && <p className="text-sm text-stone-600"><strong className="text-stone-900">Style:</strong> {product.stylingTips}</p>}</div><div className="flex gap-3 mt-8"><div className="flex items-center border border-stone-300"><button type="button" onClick={() => setQuantity(Math.max(1, quantity - 1))} className="p-3"><Minus size={14} /></button><span className="w-8 text-center text-sm">{quantity}</span><button type="button" onClick={() => setQuantity(quantity + 1)} className="p-3"><Plus size={14} /></button></div><button type="button" onClick={handleAddToCart} className="flex-1 bg-teal px-6 py-4 text-xs uppercase tracking-[0.16em] text-white hover:bg-teal-dark transition-colors">{addedToCart ? "Added to Cart" : "Add to Cart"}</button><button type="button" onClick={() => toggleWishlist()} aria-label="Add to wishlist" className="border border-stone-300 px-4 text-stone-700 hover:text-teal"><Heart className={saved ? "fill-teal text-teal" : ""} /></button></div><p className="text-xs text-stone-500 mt-4">Complimentary delivery on orders over BDT 3,000.</p></div></div></div></section>
 
     <section className="bg-[#F0E9E2] py-16 md:py-24"><div className="container mx-auto px-4 max-w-4xl"><div className="grid md:grid-cols-2 gap-10 md:gap-20"><div><p className="text-teal text-[10px] uppercase tracking-[0.24em] mb-4">The story</p><h2 className="font-serif text-4xl md:text-5xl mb-5">Designed to become a signature.</h2><p className="text-stone-600 leading-relaxed">{product.tagline} Every detail is considered for the modern Amelie woman — from the first impression to the way the piece moves with you.</p></div><div className="space-y-5 text-sm text-stone-600 leading-relaxed"><p><strong className="text-stone-900">Material:</strong> {product.material}</p><p><strong className="text-stone-900">Care:</strong> Dry clean or hand wash gently in cold water. Store away from direct sunlight.</p><p><strong className="text-stone-900">Origin:</strong> Designed with an Italian-inspired point of view for the modern Bangladesh wardrobe.</p><blockquote className="font-serif italic text-2xl text-teal border-l-2 border-gold pl-5 pt-2">“The most beautiful pieces leave room for you to become yourself.”</blockquote></div></div></div></section>
 

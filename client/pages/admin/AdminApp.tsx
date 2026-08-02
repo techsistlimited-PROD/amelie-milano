@@ -10,7 +10,7 @@ import {
   updateAdminRecord,
   verifyCmsAdmin,
 } from "@/lib/cms";
-import ImageUploadField from "@/components/admin/ImageUploadField";
+import { sanitizeDraftForCategory } from "@/lib/productFields";
 import {
   categoryShopPath,
   fieldsForResource,
@@ -24,6 +24,7 @@ import {
   sectionKeyOptions,
   validateDraft,
 } from "./cmsConfig";
+import ImageUploadField from "@/components/admin/ImageUploadField";
 
 const resources: CmsResource[] = ["products", "collections", "editorials", "sections", "pages", "faq"];
 
@@ -76,7 +77,8 @@ const ResourceEditor = ({ resource }: { resource: CmsResource }) => {
 
   const sectionKey = resource === "sections" ? String(draft.sectionKey ?? "") : "";
   const productSlug = resource === "products" ? String(draft.slug ?? "") : undefined;
-  const fields = fieldsForResource(resource, { sectionKey, productSlug, isEdit: Boolean(editingId) });
+  const productCategory = resource === "products" ? String(draft.category ?? "") : "";
+  const fields = fieldsForResource(resource, { sectionKey, productSlug, productCategory, isEdit: Boolean(editingId) });
 
   const load = async () => {
     const token = await getAccessToken();
@@ -103,7 +105,7 @@ const ResourceEditor = ({ resource }: { resource: CmsResource }) => {
     event.preventDefault();
     setError("");
     setNotice("");
-    const missing = validateDraft(resource, draft, { sectionKey });
+    const missing = validateDraft(resource, draft, { sectionKey, productCategory });
     if (missing.length) {
       setError(`Required: ${missing.join(", ")}`);
       return;
@@ -192,6 +194,11 @@ const ResourceEditor = ({ resource }: { resource: CmsResource }) => {
             <strong>On the website:</strong> {selectedSection.location}
           </p>
         )}
+        {!productCategory && resource === "products" && (
+          <p className="md:col-span-2 rounded bg-amber-50 px-4 py-3 text-sm text-stone-700">
+            Select a <strong>product type</strong> first — size, length and other fields appear based on type.
+          </p>
+        )}
         {resource === "products" && selectedCategory && (
           <p className="md:col-span-2 rounded bg-teal/10 px-4 py-3 text-sm text-stone-700">
             <strong>Will appear on:</strong> {categoryShopPath(selectedCategory)}
@@ -227,8 +234,36 @@ const ResourceEditor = ({ resource }: { resource: CmsResource }) => {
             );
           }
 
+          if (field.type === "multiselect" && field.options) {
+            const selected = Array.isArray(draft[field.key]) ? (draft[field.key] as string[]) : [];
+            return (
+              <div key={field.key} className="md:col-span-2 block text-sm">
+                {label}
+                {field.hint && <span className="mb-2 block text-xs text-stone-400">{field.hint}</span>}
+                <div className="flex flex-wrap gap-x-5 gap-y-2">
+                  {field.options.map((option) => (
+                    <label key={option.value} className="inline-flex items-center gap-2 text-sm text-stone-700">
+                      <input
+                        type="checkbox"
+                        className="accent-teal"
+                        checked={selected.includes(option.value)}
+                        onChange={(e) => {
+                          const next = e.target.checked
+                            ? [...selected, option.value]
+                            : selected.filter((item) => item !== option.value);
+                          setDraft({ ...draft, [field.key]: next });
+                        }}
+                      />
+                      {option.label}
+                    </label>
+                  ))}
+                </div>
+              </div>
+            );
+          }
+
           return (
-            <label key={field.key} className={`block text-sm ${field.type === "textarea" ? "md:col-span-2" : ""}`}>
+            <label key={field.key} className={`block text-sm ${field.type === "textarea" || field.type === "multiselect" ? "md:col-span-2" : ""}`}>
               {label}
               {field.hint && <span className="mb-2 block text-xs text-stone-400">{field.hint}</span>}
               {field.type === "boolean" ? (
@@ -244,7 +279,14 @@ const ResourceEditor = ({ resource }: { resource: CmsResource }) => {
                 <select
                   className="field w-full"
                   value={String(draft[field.key] ?? "")}
-                  onChange={(e) => setDraft({ ...draft, [field.key]: e.target.value })}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (field.key === "category" && resource === "products") {
+                      setDraft(sanitizeDraftForCategory(draft, value));
+                      return;
+                    }
+                    setDraft({ ...draft, [field.key]: value });
+                  }}
                 >
                   <option value="">Select…</option>
                   {field.options.map((option) => (

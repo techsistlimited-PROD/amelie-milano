@@ -1,6 +1,7 @@
 import type { CmsResource } from "@/lib/cms";
+import { fieldsForProductCategory } from "@/lib/productFields";
 
-export type FieldType = "text" | "textarea" | "number" | "boolean" | "image" | "select" | "readonly";
+export type FieldType = "text" | "textarea" | "number" | "boolean" | "image" | "select" | "readonly" | "multiselect";
 
 export interface FieldConfig {
   key: string;
@@ -147,16 +148,17 @@ export const fieldsForSectionKey = (sectionKey: string): FieldConfig[] => {
 
 export const fieldsForResource = (
   resource: CmsResource,
-  context: { sectionKey?: string; productSlug?: string; isEdit?: boolean } = {},
+  context: { sectionKey?: string; productSlug?: string; productCategory?: string; isEdit?: boolean } = {},
 ): FieldConfig[] => {
   if (resource === "products") {
-    const base: FieldConfig[] = [
+    const category = context.productCategory ?? "";
+    const shared: FieldConfig[] = [
       req({ key: "title", label: "Product name" }),
       req({
         key: "category",
         label: "Product type",
         type: "select",
-        hint: "Choose the menu section — e.g. Bags shows on /shop/bags only.",
+        hint: "Choose the menu section — fields below change based on type.",
         options: PRODUCT_CATEGORIES.map((item) => ({
           value: item,
           label: `${item} → ${categoryShopPath(item)}`,
@@ -167,12 +169,9 @@ export const fieldsForResource = (
       req({ key: "heroImage", label: "Product image", type: "image" }),
       { key: "colour", label: "Colour" },
       { key: "material", label: "Material" },
-      {
-        key: "length",
-        label: "Dress length",
-        type: "select",
-        options: [{ value: "", label: "N/A" }, { value: "Mini", label: "Mini" }, { value: "Midi", label: "Midi" }, { value: "Maxi", label: "Maxi" }],
-      },
+    ];
+    const typeFields = category ? (fieldsForProductCategory(category) as FieldConfig[]) : [];
+    const tail: FieldConfig[] = [
       {
         key: "availability",
         label: "Availability",
@@ -193,10 +192,11 @@ export const fieldsForResource = (
       bool("isNew", "Show in New In"),
       bool("isVisible", "Visible on website"),
     ];
+    const fields = [...shared, ...typeFields, ...tail];
     if (context.isEdit && context.productSlug) {
-      return [{ key: "slug", label: "Product URL", type: "readonly", hint: `/product/${context.productSlug}` }, ...base];
+      return [{ key: "slug", label: "Product URL", type: "readonly", hint: `/product/${context.productSlug}` }, ...fields];
     }
-    return base;
+    return fields;
   }
 
   if (resource === "collections") {
@@ -319,8 +319,8 @@ export const listSubtitleFor = (resource: CmsResource, row: Record<string, unkno
   return "";
 };
 
-export const validateDraft = (resource: CmsResource, draft: Record<string, unknown>, context: { sectionKey?: string } = {}) => {
-  return fieldsForResource(resource, { ...context, isEdit: Boolean(draft.id) })
+export const validateDraft = (resource: CmsResource, draft: Record<string, unknown>, context: { sectionKey?: string; productCategory?: string } = {}) => {
+  return fieldsForResource(resource, { ...context, productCategory: context.productCategory ?? String(draft.category ?? ""), isEdit: Boolean(draft.id) })
     .filter((field) => field.required && field.type !== "readonly")
     .filter((field) => {
       const value = draft[field.key];
@@ -331,13 +331,18 @@ export const validateDraft = (resource: CmsResource, draft: Record<string, unkno
 
 export const preparePayload = (resource: CmsResource, draft: Record<string, unknown>, isNew = false) => {
   const sectionKey = String(draft.sectionKey ?? "");
-  const fields = fieldsForResource(resource, { sectionKey, isEdit: !isNew });
+  const productCategory = String(draft.category ?? "");
+  const fields = fieldsForResource(resource, { sectionKey, productCategory, isEdit: !isNew });
   const payload: Record<string, unknown> = {};
 
   for (const field of fields) {
     if (field.type === "readonly") continue;
     const value = draft[field.key];
     if (value === undefined || value === "") continue;
+    if (field.type === "multiselect") {
+      payload[field.key] = Array.isArray(value) ? value : [];
+      continue;
+    }
     payload[field.key] = value;
   }
 
@@ -353,4 +358,11 @@ export const preparePayload = (resource: CmsResource, draft: Record<string, unkn
   return payload;
 };
 
-export const rowToDraft = (resource: CmsResource, row: Record<string, unknown>) => ({ ...row });
+export const rowToDraft = (resource: CmsResource, row: Record<string, unknown>) => {
+  const draft = { ...row };
+  if (resource === "products") {
+    if (!Array.isArray(draft.sizes)) draft.sizes = [];
+    if (!Array.isArray(draft.occasions)) draft.occasions = [];
+  }
+  return draft;
+};
