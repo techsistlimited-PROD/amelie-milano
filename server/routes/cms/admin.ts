@@ -45,6 +45,10 @@ cmsAdminRouter.get("/:resource", async (req, res) => {
 
 cmsAdminRouter.post("/:resource", async (req, res) => {
   const resource = req.params.resource as Resource;
+  if (resource === "collections") {
+    res.status(403).json({ message: "Shop pages are fixed — edit an existing page instead." });
+    return;
+  }
   const config = tableConfig[resource];
   if (!config || !cmsConfigured()) {
     res.status(404).json({ message: "Unknown resource." });
@@ -75,6 +79,10 @@ cmsAdminRouter.put("/:resource/:id", async (req, res) => {
 
 cmsAdminRouter.delete("/:resource/:id", async (req, res) => {
   const resource = req.params.resource as Resource;
+  if (resource === "collections") {
+    res.status(403).json({ message: "Shop pages cannot be deleted." });
+    return;
+  }
   const config = tableConfig[resource];
   if (!config || !cmsConfigured()) {
     res.status(404).json({ message: "Unknown resource." });

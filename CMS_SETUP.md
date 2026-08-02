@@ -26,7 +26,7 @@ This creates the `cms-media` bucket so admins can upload images from their compu
 Add your admin email (same account you use to sign in on the site):
 
 ```env
-CMS_ADMIN_EMAILS=techsistlimited@gmail.com
+CMS_ADMIN_EMAILS=ameliemilalo@gmail.com
 
 SUPABASE_URL=https://kcaqrqyggshkroghxexc.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key

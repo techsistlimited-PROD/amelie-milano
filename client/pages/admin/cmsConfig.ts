@@ -50,6 +50,15 @@ export const groupRecordsByCategory = (records: Record<string, unknown>[]) => {
   return groups;
 };
 
+export const SHOP_PAGE_SLUGS = [
+  { value: "dresses", label: "Dresses → /shop/dresses" },
+  { value: "occasionwear", label: "Occasionwear → /shop/occasionwear" },
+  { value: "body-care", label: "Body Care → /shop/body-care" },
+  { value: "gym-wear", label: "Gym Wear → /shop/gym-wear" },
+  { value: "bags", label: "Bags → /shop/bags" },
+  { value: "shoes", label: "Shoes → /shop/shoes" },
+] as const;
+
 export const FAQ_CATEGORIES = [
   "Orders & Payments",
   "Shipping & Delivery",
@@ -63,7 +72,7 @@ export const EDITORIAL_CATEGORIES = ["Fashion", "Style Tips", "Lifestyle", "Edit
 
 export const resourceMeta: Record<
   CmsResource,
-  { label: string; description: string; previewPath?: string }
+  { label: string; description: string; previewPath?: string; editOnly?: boolean }
 > = {
   products: {
     label: "Products",
@@ -72,8 +81,9 @@ export const resourceMeta: Record<
   },
   collections: {
     label: "Shop pages",
-    description: "Banner and title for each menu page — Dresses, Bags, Shoes, Body Care, etc.",
+    description: "Edit banner and title for each menu page. Pages are fixed — select one below to edit.",
     previewPath: "/shop/dresses",
+    editOnly: true,
   },
   editorials: {
     label: "Journal",
@@ -148,7 +158,7 @@ export const fieldsForSectionKey = (sectionKey: string): FieldConfig[] => {
 
 export const fieldsForResource = (
   resource: CmsResource,
-  context: { sectionKey?: string; productSlug?: string; productCategory?: string; isEdit?: boolean } = {},
+  context: { sectionKey?: string; productSlug?: string; productCategory?: string; collectionSlug?: string; isEdit?: boolean } = {},
 ): FieldConfig[] => {
   if (resource === "products") {
     const category = context.productCategory ?? "";
@@ -200,20 +210,14 @@ export const fieldsForResource = (
   }
 
   if (resource === "collections") {
+    const slug = context.collectionSlug ?? "";
     return [
-      req({
+      {
         key: "slug",
         label: "Shop page",
-        type: "select",
-        options: [
-          { value: "dresses", label: "Dresses → /shop/dresses" },
-          { value: "occasionwear", label: "Occasionwear → /shop/occasionwear" },
-          { value: "body-care", label: "Body Care → /shop/body-care" },
-          { value: "gym-wear", label: "Gym Wear → /shop/gym-wear" },
-          { value: "bags", label: "Bags → /shop/bags" },
-          { value: "shoes", label: "Shoes → /shop/shoes" },
-        ],
-      }),
+        type: "readonly",
+        hint: slug ? `/shop/${slug}` : undefined,
+      },
       req({ key: "title", label: "Page title" }),
       { key: "description", label: "Description", type: "textarea" },
       req({ key: "heroImage", label: "Banner image", type: "image" }),

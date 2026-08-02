@@ -78,7 +78,9 @@ const ResourceEditor = ({ resource }: { resource: CmsResource }) => {
   const sectionKey = resource === "sections" ? String(draft.sectionKey ?? "") : "";
   const productSlug = resource === "products" ? String(draft.slug ?? "") : undefined;
   const productCategory = resource === "products" ? String(draft.category ?? "") : "";
-  const fields = fieldsForResource(resource, { sectionKey, productSlug, productCategory, isEdit: Boolean(editingId) });
+  const collectionSlug = resource === "collections" ? String(draft.slug ?? "") : "";
+  const fields = fieldsForResource(resource, { sectionKey, productSlug, productCategory, collectionSlug, isEdit: Boolean(editingId) });
+  const editOnly = Boolean(meta.editOnly);
 
   const load = async () => {
     const token = await getAccessToken();
@@ -166,7 +168,9 @@ const ResourceEditor = ({ resource }: { resource: CmsResource }) => {
       <td className="px-4 py-3">{String(row.isVisible ?? true)}</td>
       <td className="space-x-3 px-4 py-3">
         <button type="button" className="text-teal underline" onClick={() => edit(row)}>Edit</button>
-        <button type="button" className="text-red-600 underline" onClick={() => remove(String(row.id))}>Delete</button>
+        {!editOnly && (
+          <button type="button" className="text-red-600 underline" onClick={() => remove(String(row.id))}>Delete</button>
+        )}
       </td>
     </tr>
   );
@@ -187,8 +191,13 @@ const ResourceEditor = ({ resource }: { resource: CmsResource }) => {
 
       {(error || notice) && <p className={`text-sm ${error ? "text-red-600" : "text-teal"}`}>{error || notice}</p>}
 
+      {(editOnly && !editingId) ? (
+        <p className="rounded border border-stone-200 bg-white px-6 py-5 text-sm text-stone-600">
+          Shop pages are fixed on the website. Click <strong>Edit</strong> on a page below to change its banner, title, or description.
+        </p>
+      ) : (
       <form onSubmit={save} className="grid gap-3 rounded border border-stone-200 bg-white p-6 md:grid-cols-2">
-        <h3 className="md:col-span-2 font-serif text-2xl">{editingId ? "Edit item" : "Add new item"}</h3>
+        <h3 className="md:col-span-2 font-serif text-2xl">{editingId ? (editOnly ? "Edit shop page" : "Edit item") : "Add new item"}</h3>
         {selectedSection && (
           <p className="md:col-span-2 rounded bg-[#F0E9E2] px-4 py-3 text-sm text-stone-700">
             <strong>On the website:</strong> {selectedSection.location}
@@ -315,6 +324,7 @@ const ResourceEditor = ({ resource }: { resource: CmsResource }) => {
           {editingId && <button type="button" className="btn-outline" onClick={resetDraft}>Cancel</button>}
         </div>
       </form>
+      )}
 
       {resource === "products" && (
         <div className="flex flex-wrap gap-2">
