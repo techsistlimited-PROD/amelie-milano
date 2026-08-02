@@ -16,6 +16,7 @@ export interface CmsProduct {
   occasions?: string[];
   length?: string;
   availability?: string;
+  displayOrder?: number;
   variants?: { size?: string; color?: string; volume?: string; details?: string }[];
   stylingTips?: string;
 }

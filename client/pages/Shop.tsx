@@ -7,6 +7,8 @@ import ProductCard from "@/components/ProductCard";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { shopCategories, storeCatalog } from "@/lib/storeCatalog";
 import { fetchBuilderProducts } from "@/lib/builder";
+import { sortByDisplayOrder, toProductCard } from "@/lib/cmsCatalog";
+import type { StoreProductCard } from "@/lib/cmsCatalog";
 
 const Shop = () => {
   const [searchParams] = useSearchParams();
@@ -14,24 +16,18 @@ const Shop = () => {
   const [query, setQuery] = useState(searchParams.get("query") ?? "");
   const [sort, setSort] = useState("newest");
   const [showFilters, setShowFilters] = useState(false);
-  const [cmsProducts, setCmsProducts] = useState<typeof storeCatalog>([]);
+  const [cmsProducts, setCmsProducts] = useState<StoreProductCard[]>([]);
+  const [cmsReady, setCmsReady] = useState(false);
   useEffect(() => setQuery(searchParams.get("query") ?? ""), [searchParams]);
   useEffect(() => {
     void fetchBuilderProducts().then((entries) => {
-      if (!entries.length) return;
-      setCmsProducts(entries.map((data) => ({
-        id: data.slug,
-        name: data.title,
-        price: data.priceBdt,
-        category: data.category,
-        colour: data.colour ?? data.variants?.[0]?.color ?? "Signature",
-        material: data.material ?? "Amelie Milano signature finish",
-        image: data.heroImage,
-        isNew: data.isNew,
-      })));
+      setCmsProducts(sortByDisplayOrder(entries).map(toProductCard));
+      setCmsReady(true);
     });
   }, []);
-  const products = cmsProducts.length ? cmsProducts : storeCatalog;
+  const products = cmsReady
+    ? cmsProducts
+    : storeCatalog.map((item) => ({ id: item.id, name: item.name, price: item.price, image: item.image, isNew: item.isNew, category: item.category, colour: item.colour, material: item.material }));
   const filtered = useMemo(() => { const result = products.filter((item) => (category === "All" || (category === "New In" ? item.isNew : item.category === category)) && `${item.name} ${item.category} ${item.colour} ${item.material}`.toLowerCase().includes(query.toLowerCase())); return [...result].sort((a, b) => sort === "low" ? a.price - b.price : sort === "high" ? b.price - a.price : Number(Boolean(b.isNew)) - Number(Boolean(a.isNew))); }, [products, category, query, sort]);
   return <div className="min-h-screen bg-ivory text-stone-900"><Header /><main><div className="container mx-auto px-4 pt-8"><Breadcrumbs items={[{ label: "Shop All" }]} /></div><section className="border-b border-stone-200 bg-[#F0E9E2] px-4 py-20 md:py-28"><div className="container mx-auto max-w-6xl"><p className="mb-4 text-[10px] uppercase tracking-[0.3em] text-teal">The complete Amelie wardrobe</p><h1 className="font-serif text-6xl md:text-8xl">Shop All</h1><p className="mt-5 max-w-xl text-sm leading-7 text-stone-600 md:text-base">A considered edit of Italian-inspired fashion, beauty, and lifestyle pieces designed to move beautifully through your world.</p></div></section><section className="container mx-auto px-4 py-12 md:py-16"><div className="mx-auto max-w-6xl"><div className="flex flex-col gap-5 border-y border-stone-200 py-5 lg:flex-row lg:items-center lg:justify-between"><div className="flex items-center gap-3"><button onClick={() => setShowFilters(!showFilters)} className="inline-flex items-center gap-2 border border-stone-300 px-4 py-3 text-xs uppercase tracking-[0.14em] lg:hidden"><Filter size={15} /> Filters</button><div className={`${showFilters ? "flex" : "hidden"} flex-wrap gap-2 lg:flex`}>{shopCategories.map((item) => <button key={item} onClick={() => setCategory(item)} className={`px-3 py-2 text-xs uppercase tracking-[0.12em] ${category === item ? "bg-teal text-white" : "text-stone-600 hover:text-teal"}`}>{item}</button>)}</div></div><div className="flex flex-col gap-3 sm:flex-row"><label className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" size={16} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search the edit" className="w-full border border-stone-200 bg-white py-3 pl-10 pr-4 text-sm outline-none focus:border-teal sm:w-52" /></label><label className="relative"><SlidersHorizontal className="absolute left-3 top-1/2 -translate-y-1/2 text-teal" size={15} /><select value={sort} onChange={(event) => setSort(event.target.value)} className="w-full appearance-none border border-stone-200 bg-white py-3 pl-9 pr-9 text-xs uppercase tracking-[0.1em] outline-none sm:w-52"><option value="newest">Sort: Newest</option><option value="low">Price: Low → High</option><option value="high">Price: High → Low</option></select><ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2" size={15} /></label></div></div><div className="mt-10 flex items-end justify-between"><div><p className="text-[10px] uppercase tracking-[0.2em] text-teal">The edit</p><h2 className="mt-2 font-serif text-3xl">{category === "All" ? "Everything Amelie" : category}</h2></div><span className="text-sm text-stone-500">{filtered.length} pieces</span></div><div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4 md:gap-x-6 md:gap-y-14">{filtered.map((product) => <ProductCard key={product.id} id={product.id} name={product.name} price={product.price} image={product.image} isNew={product.isNew} />)}</div>{!filtered.length && <div className="py-24 text-center"><h3 className="font-serif text-3xl">No pieces found</h3><p className="mt-3 text-sm text-stone-600">Try another category or search term.</p></div>}</div></section><section className="bg-[#E8D7C5] px-4 py-16 md:py-24"><div className="container mx-auto grid max-w-6xl gap-10 md:grid-cols-2 md:items-center"><div><p className="mb-3 text-[10px] uppercase tracking-[0.28em] text-teal">The Amelie Way</p><h2 className="font-serif text-5xl">Crafted with intention.</h2><p className="mt-5 max-w-md text-sm leading-7 text-stone-600">Every piece is chosen for its texture, movement, and ability to become part of your personal story.</p></div><img src="https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F8643453bf7a947959862f314163ce4f6?format=webp&width=1200&height=900&quality=95" alt="Amelie Milano considered craftsmanship" className="aspect-[4/3] w-full object-cover" /></div></section></main><Footer /></div>;
 };

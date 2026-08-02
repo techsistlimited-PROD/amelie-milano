@@ -90,6 +90,7 @@ export const mapProduct = (row: Record<string, unknown>) => ({
   occasions: Array.isArray(row.occasions) ? (row.occasions as string[]) : [],
   length: row.length ? String(row.length) : undefined,
   availability: row.availability ? String(row.availability) : "In Stock",
+  displayOrder: Number(row.display_order ?? 0),
   variants: (row.variants as unknown[]) ?? [],
   stylingTips: row.styling_tips ? String(row.styling_tips) : undefined,
 });

@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { fetchBuilderProducts, fetchBuilderSiteSections, type BuilderSiteSectionData } from "@/lib/builder";
+import { resolveSectionProducts, sortByDisplayOrder, toProductCard } from "@/lib/cmsCatalog";
+import type { CmsProduct } from "@/lib/cms";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
@@ -102,7 +104,8 @@ const categories = [
 
 const Index = () => {
   const [cmsSections, setCmsSections] = useState<BuilderSiteSectionData[]>([]);
-  const [cmsProducts, setCmsProducts] = useState<Array<{ id: string; name: string; price: number; image: string; isNew?: boolean }>>([]);
+  const [cmsProducts, setCmsProducts] = useState<CmsProduct[]>([]);
+  const [cmsReady, setCmsReady] = useState(false);
 
   useEffect(() => {
     void (async () => {
@@ -110,36 +113,29 @@ const Index = () => {
         fetchBuilderSiteSections(),
         fetchBuilderProducts(),
       ]);
-      if (sections.length) setCmsSections(sections);
-      if (products.length) {
-        setCmsProducts(products.map((data) => ({
-          id: data.slug,
-          name: data.title,
-          price: data.priceBdt,
-          image: data.heroImage,
-          isNew: data.isNew ?? false,
-        })));
-      }
+      setCmsSections(sections);
+      setCmsProducts(sortByDisplayOrder(products));
+      setCmsReady(true);
     })();
   }, []);
 
   const sections = useMemo(() => new Map(cmsSections.map((section) => [section.key, section])), [cmsSections]);
   const getSection = (key: string) => sections.get(key);
-  const sectionVisible = (key: string) => getSection(key)?.isVisible !== false;
+  const sectionVisible = (key: string) => {
+    const section = getSection(key);
+    if (!section) return true;
+    return section.isVisible !== false;
+  };
   const homepageCategories = getSection("homepage-categories")?.items?.length
     ? getSection("homepage-categories")?.items?.map((item) => typeof item === "string" ? { name: item, image: "", href: "#" } : { name: item.name ?? item.label ?? item.title ?? "", image: item.image ?? "", href: item.href ?? item.url ?? "#" })
     : categories;
-  const productsForSection = (key: string, fallback: Array<{ id: string; name: string; price: number; image: string; isNew?: boolean }>) => {
-    const section = getSection(key);
-    const references = section?.productReferences?.length ? section.productReferences : section?.items?.filter((item): item is string => typeof item === "string");
-    if (!references?.length || !cmsProducts.length) return fallback;
-    const products = cmsProducts.filter((product) => references.includes(product.id));
-    return products.length ? products : fallback;
-  };
-  const homepageNewArrivals = productsForSection("homepage-new-arrivals", newArrivals);
-  const homepageBestSellers = productsForSection("homepage-best-sellers", bestSellers);
+  const homepageNewArrivals = cmsReady
+    ? resolveSectionProducts(getSection("homepage-new-arrivals"), cmsProducts, (product) => Boolean(product.isNew))
+    : newArrivals;
+  const homepageBestSellers = cmsReady
+    ? resolveSectionProducts(getSection("homepage-best-sellers"), cmsProducts, (product) => !product.isNew)
+    : bestSellers;
   const hero = getSection("homepage-hero");
-  const brandPromise = getSection("homepage-brand-promise");
 
   return (
     <div className="min-h-screen bg-ivory">

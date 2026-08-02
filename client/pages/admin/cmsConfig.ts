@@ -154,8 +154,8 @@ export const fieldsForResource = (resource: CmsResource): FieldConfig[] => {
       { key: "heroImage", label: "Section image", hint: "Hero / feature image for this block", type: "image" },
       {
         key: "productSlugs",
-        label: "Product IDs for this section",
-        hint: "For New Arrivals / Best Sellers — comma-separated, e.g. 1,2,3,4",
+        label: "Product IDs (optional order)",
+        hint: "Optional — pin products first e.g. 1,2,3. New products in the same category still appear automatically.",
       },
       bool("isVisible", "Show this section on homepage"),
       { key: "displayOrder", label: "Sort order", type: "number" },
@@ -201,7 +201,7 @@ export const listSubtitleFor = (resource: CmsResource, row: Record<string, unkno
   return "";
 };
 
-export const preparePayload = (resource: CmsResource, draft: Record<string, unknown>) => {
+export const preparePayload = (resource: CmsResource, draft: Record<string, unknown>, isNew = false) => {
   const payload: Record<string, unknown> = {};
   for (const field of fieldsForResource(resource)) {
     const value = draft[field.key];
@@ -216,6 +216,8 @@ export const preparePayload = (resource: CmsResource, draft: Record<string, unkn
     }
     payload[field.key] = value;
   }
+  if (isNew && payload.isVisible === undefined) payload.isVisible = true;
+  if (resource === "products" && isNew && payload.priceBdt === undefined) payload.priceBdt = 0;
   return payload;
 };
 

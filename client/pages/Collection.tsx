@@ -7,6 +7,8 @@ import ProductCard from "@/components/ProductCard";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { storeCatalog } from "@/lib/storeCatalog";
 import { fetchBuilderCollection, fetchBuilderProducts, type BuilderCollectionData } from "@/lib/builder";
+import { resolveCollectionProducts, sortByDisplayOrder } from "@/lib/cmsCatalog";
+import type { CmsProduct } from "@/lib/cms";
 
 const collectionMap = {
   new: { title: "New In", kicker: "The latest chapter", copy: "A first look at the newest silhouettes, considered details, and fresh perspectives entering the Amelie wardrobe.", image: "https://cdn.builder.io/api/v1/image/assets%2F661d1ac868bc41caba3d7f46cd61e3ce%2F9bd2b790b1514a22af7615257f60ceaf?format=webp&width=1800&height=1100&quality=95", category: "New In", builderSlug: "new-in" },
@@ -24,7 +26,7 @@ const Collection = () => {
   const { id = "new" } = useParams();
   const fallback = collectionMap[id as keyof typeof collectionMap] ?? collectionMap.new;
   const [cmsCollection, setCmsCollection] = useState<BuilderCollectionData | null>(null);
-  const [cmsProducts, setCmsProducts] = useState<Array<{ slug: string; title: string; priceBdt: number; heroImage: string; category: string; isNew?: boolean }>>([]);
+  const [cmsProducts, setCmsProducts] = useState<CmsProduct[]>([]);
 
   useEffect(() => {
     setCmsCollection(null);
@@ -35,7 +37,7 @@ const Collection = () => {
         fetchBuilderProducts(),
       ]);
       if (collectionData) setCmsCollection(collectionData);
-      if (products.length) setCmsProducts(products);
+      if (products.length) setCmsProducts(sortByDisplayOrder(products));
     })();
   }, [fallback.builderSlug]);
 
@@ -47,23 +49,10 @@ const Collection = () => {
   };
 
   const products = useMemo(() => {
-    const references = cmsCollection?.products?.map((product) => typeof product === "string" ? product : product).filter(Boolean);
-    if (references?.length && cmsProducts.length) {
-      const related = cmsProducts.filter((data) => references.includes(data.slug));
-      if (related.length) {
-        return related.map((data) => ({
-          id: data.slug,
-          name: data.title,
-          price: data.priceBdt,
-          category: data.category,
-          material: "Amelie Milano signature finish",
-          colour: "Signature",
-          image: data.heroImage,
-          isNew: data.isNew,
-        }));
-      }
+    if (!cmsProducts.length) {
+      return storeCatalog.filter((item) => fallback.category === "New In" ? item.isNew : item.category === fallback.category);
     }
-    return storeCatalog.filter((item) => fallback.category === "New In" ? item.isNew : item.category === fallback.category);
+    return resolveCollectionProducts(cmsCollection?.products, cmsProducts, fallback.category);
   }, [cmsCollection, cmsProducts, fallback.category]);
 
   useEffect(() => {

@@ -7,6 +7,7 @@ import { useWishlist } from "@/lib/wishlist";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { fetchBuilderProducts } from "@/lib/builder";
+import { sortByDisplayOrder, toProductCard } from "@/lib/cmsCatalog";
 
 const newInProducts = [
   {
@@ -94,8 +95,8 @@ const NewIn = () => {
   const [products, setProducts] = useState(newInProducts);
   useEffect(() => {
     void fetchBuilderProducts().then((entries) => {
-      const next = entries.filter((data) => data.isNew).map((data) => ({ id: data.slug, name: data.title, price: data.priceBdt, image: data.heroImage }));
-      if (next.length) setProducts(next);
+      const next = sortByDisplayOrder(entries.filter((data) => data.isNew)).map(toProductCard);
+      setProducts(next.length ? next : newInProducts);
     });
   }, []);
   return <div className="min-h-screen bg-ivory">

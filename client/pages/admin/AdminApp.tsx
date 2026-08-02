@@ -97,7 +97,7 @@ const ResourceEditor = ({ resource }: { resource: CmsResource }) => {
     setNotice("");
     const token = await getAccessToken();
     if (!token) return;
-    const payload = preparePayload(resource, draft);
+    const payload = preparePayload(resource, draft, !editingId);
     try {
       if (editingId) {
         await updateAdminRecord(token, resource, editingId, payload);

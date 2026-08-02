@@ -32,7 +32,7 @@ const Journal = () => {
 
   useEffect(() => {
     void fetchBuilderEditorials().then((entries) => {
-      if (entries.length) setCmsArticles(entries.map((data) => toArticle(data)));
+      setCmsArticles(entries.map((data) => toArticle(data)));
     });
   }, []);
 

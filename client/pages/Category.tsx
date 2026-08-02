@@ -7,6 +7,7 @@ import { useWishlist } from "@/lib/wishlist";
 import PlaceholderPage from "./PlaceholderPage";
 import { fetchBuilderCollection, fetchBuilderProducts } from "@/lib/builder";
 import { CatalogProduct, cmsToCatalog, filterCatalogProducts, sortCatalogProducts } from "@/lib/catalogProduct";
+import { resolveCollectionProducts, sortByDisplayOrder } from "@/lib/cmsCatalog";
 
 const subcategories = [
   "All Dresses",
@@ -94,12 +95,18 @@ const Category = () => {
         fetchBuilderCollection("dresses"),
         fetchBuilderProducts(),
       ]);
-      const catalog = allProducts.map(cmsToCatalog);
-      const slugs = collection?.products?.length ? collection.products : null;
-      const listed = slugs?.length
-        ? slugs.map((slug) => catalog.find((item) => item.id === slug)).filter((item): item is CatalogProduct => Boolean(item))
-        : catalog.filter((item) => item.category === "Dresses" || item.category === "Occasionwear");
-      if (listed.length) setDressProducts(listed);
+      const sorted = sortByDisplayOrder(allProducts);
+      const cards = resolveCollectionProducts(collection?.products, sorted, "Dresses");
+      if (cards.length) {
+        setDressProducts(
+          cards
+            .map((item) => {
+              const source = sorted.find((product) => product.slug === item.id);
+              return source ? cmsToCatalog(source) : null;
+            })
+            .filter((item): item is CatalogProduct => Boolean(item)),
+        );
+      }
     })();
   }, [category]);
 
