@@ -26,12 +26,14 @@ const ProductCard = ({
   isSale,
   isLowStock,
 }: ProductCardProps) => {
-  const { saved: isWishlisted, toggle: toggleWishlist } = useWishlist({ id, name, price: salePrice ?? price, image, category: "Amelie Milano", colour: "Signature colour", option: "M" });
+  const onSale = salePrice != null && salePrice < price;
+  const displayPrice = onSale ? salePrice : price;
+  const { saved: isWishlisted, toggle: toggleWishlist } = useWishlist({ id, name, price: displayPrice, image, category: "Amelie Milano", colour: "Signature colour", option: "M" });
   const navigate = useNavigate();
   const [quickViewOpen, setQuickViewOpen] = useState(false);
 
   const handleAddToCart = () => {
-    addToCart({ id, name, price: salePrice ?? price, image, category: "Amelie Milano", colour: "Signature colour", option: "M", quantity: 1 });
+    addToCart({ id, name, price: displayPrice, image, category: "Amelie Milano", colour: "Signature colour", option: "M", quantity: 1 });
     navigate("/cart");
   };
 
@@ -55,7 +57,7 @@ const ProductCard = ({
               New
             </span>
           )}
-          {isSale && (
+          {onSale && (
             <span className="bg-red-500 text-white text-xs font-medium px-3 py-1 rounded-full">
               Sale
             </span>
@@ -99,7 +101,16 @@ const ProductCard = ({
             <div className="flex flex-col justify-center pr-4">
               <p className="mb-3 text-[10px] uppercase tracking-[0.2em] text-teal">Amelie Milano</p>
               <h2 id={`quick-view-${id}`} className="font-serif text-3xl text-stone-900">{name}</h2>
-              <p className="mt-4 text-lg text-stone-700">BDT {(salePrice ?? price).toLocaleString()}</p>
+              <p className="mt-4 text-lg text-stone-700">
+                {onSale ? (
+                  <>
+                    <span className="text-stone-400 line-through text-base mr-2">BDT {price.toLocaleString()}</span>
+                    <span className="font-semibold text-teal">BDT {salePrice!.toLocaleString()}</span>
+                  </>
+                ) : (
+                  <>BDT {price.toLocaleString()}</>
+                )}
+              </p>
               <button type="button" onClick={() => { setQuickViewOpen(false); navigate(`/product/${id}`); }} className="btn-primary mt-7 inline-flex justify-center">View Product</button>
             </div>
           </div>
@@ -114,13 +125,13 @@ const ProductCard = ({
           </h3>
         </Link>
         <div className="flex items-center gap-2">
-          {salePrice ? (
+          {onSale ? (
             <>
               <span className="text-stone-500 line-through text-sm">
                 BDT {price.toLocaleString()}
               </span>
               <span className="font-semibold text-teal">
-                BDT {salePrice.toLocaleString()}
+                BDT {salePrice!.toLocaleString()}
               </span>
             </>
           ) : (

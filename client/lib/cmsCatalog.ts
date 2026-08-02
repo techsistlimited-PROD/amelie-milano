@@ -17,7 +17,7 @@ export interface StoreProductCard {
 export const toProductCard = (product: CmsProduct): StoreProductCard => ({
   id: product.slug,
   name: product.title,
-  price: product.salePriceBdt ?? product.priceBdt,
+  price: product.priceBdt,
   salePrice: product.salePriceBdt,
   image: product.heroImage,
   isNew: product.isNew,

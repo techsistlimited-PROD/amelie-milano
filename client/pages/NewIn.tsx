@@ -7,7 +7,7 @@ import { useWishlist } from "@/lib/wishlist";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { fetchBuilderProducts } from "@/lib/builder";
-import { sortByDisplayOrder, toProductCard } from "@/lib/cmsCatalog";
+import { sortByDisplayOrder, toProductCard, type StoreProductCard } from "@/lib/cmsCatalog";
 
 const newInProducts = [
   {
@@ -69,11 +69,13 @@ const categories = [
   { label: "Gym Wear", href: "/shop/gym-wear" },
 ];
 
-const NewInProductCard = ({ product }: { product: (typeof newInProducts)[number] }) => {
-  const { saved: wishlisted, toggle } = useWishlist({ id: product.id, name: product.name, price: product.price, image: product.image, category: "New In", colour: "Signature colour", option: "M" });
+const NewInProductCard = ({ product }: { product: StoreProductCard }) => {
+  const onSale = product.salePrice != null && product.salePrice < product.price;
+  const displayPrice = onSale ? product.salePrice! : product.price;
+  const { saved: wishlisted, toggle } = useWishlist({ id: product.id, name: product.name, price: displayPrice, image: product.image, category: "New In", colour: "Signature colour", option: "M" });
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
-  const handleAdd = () => { addToCart({ id: product.id, name: product.name, price: product.price, image: product.image, category: "New In", colour: "Signature colour", option: "M", quantity }); setAdded(true); };
+  const handleAdd = () => { addToCart({ id: product.id, name: product.name, price: displayPrice, image: product.image, category: "New In", colour: "Signature colour", option: "M", quantity }); setAdded(true); };
 
   return (
     <article className="group">
@@ -86,17 +88,26 @@ const NewInProductCard = ({ product }: { product: (typeof newInProducts)[number]
         <div className="absolute inset-x-0 bottom-0 flex translate-y-0 md:translate-y-full items-center justify-between gap-2 bg-white/95 p-3 transition-transform duration-300 group-hover:translate-y-0"><div className="flex items-center border border-stone-200"><button type="button" aria-label="Decrease quantity" onClick={() => setQuantity(Math.max(1, quantity - 1))} className="p-2 text-stone-600 hover:text-teal"><Minus size={13} /></button><span className="w-6 text-center text-sm">{quantity}</span><button type="button" aria-label="Increase quantity" onClick={() => setQuantity(quantity + 1)} className="p-2 text-stone-600 hover:text-teal"><Plus size={13} /></button></div><button type="button" onClick={handleAdd} className="flex flex-1 items-center justify-center gap-1 bg-teal px-3 py-2 text-[10px] uppercase tracking-[0.1em] text-white hover:bg-teal-dark"><ShoppingBag size={14} />{added ? "Added" : "Add"}</button></div>
       </div>
       <Link to={`/product/${product.id}`}><h3 className="font-serif text-lg leading-tight text-stone-900 group-hover:text-teal transition-colors">{product.name}</h3></Link>
-      <p className="mt-2 text-sm text-stone-800">BDT {product.price.toLocaleString()}</p>
+      <div className="mt-2 flex items-center gap-2 text-sm">
+        {onSale ? (
+          <>
+            <span className="text-stone-400 line-through">BDT {product.price.toLocaleString()}</span>
+            <span className="text-teal font-semibold">BDT {product.salePrice!.toLocaleString()}</span>
+          </>
+        ) : (
+          <span className="text-stone-800">BDT {product.price.toLocaleString()}</span>
+        )}
+      </div>
     </article>
   );
 };
 
 const NewIn = () => {
-  const [products, setProducts] = useState(newInProducts);
+  const [products, setProducts] = useState<StoreProductCard[]>(newInProducts.map((item) => ({ ...item })));
   useEffect(() => {
     void fetchBuilderProducts().then((entries) => {
       const next = sortByDisplayOrder(entries.filter((data) => data.isNew)).map(toProductCard);
-      setProducts(next.length ? next : newInProducts);
+      setProducts(next.length ? next : newInProducts.map((item) => ({ ...item })));
     });
   }, []);
   return <div className="min-h-screen bg-ivory">

@@ -64,7 +64,7 @@ const DressProductCard = ({ product }: { product: CatalogProduct }) => {
         </h3>
       </Link>
       <div className="flex items-center gap-2 mt-2 text-sm">
-        {product.salePrice ? (
+        {product.salePrice != null && product.salePrice < product.price ? (
           <>
             <span className="text-stone-400 line-through">BDT {product.price.toLocaleString()}</span>
             <span className="text-teal font-semibold">BDT {product.salePrice.toLocaleString()}</span>
